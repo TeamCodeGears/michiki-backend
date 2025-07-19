@@ -8,8 +8,6 @@ public class MichikiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MichikiApplication.class, args);
-
-		System.out.println('asd');
 	}
 }
 
