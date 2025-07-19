@@ -1,26 +1,27 @@
 spring:
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: "jdbc:oracle:thin:@localhost:1521:XE"
+    url: jdbc:oracle:thin:@localhost:1521:XE
     username: system
     password: oracle
+
     hikari:
-      maximum-pool-size: 3
       minimum-idle: 1
+      maximum-pool-size: 3
       connection-timeout: 60000
       validation-timeout: 5000
-      test-on-borrow: true
-      test-while-idle: true
-      validation-query: "SELECT 1 FROM DUAL"
-      jpa:
-        database-platform: org.hibernate.dialect.OracleDialect
-        hibernate:
-          ddl-auto: validate
-        show-sql: true
-        properties:
-          hibernate:
-            format_sql: true
-            use_sql_comments: true
-      mvc:
-        view:
-          suffix: .html
+      connection-test-query: SELECT 1 FROM DUAL
+
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  mvc:
+    view:
+      suffix: .html
