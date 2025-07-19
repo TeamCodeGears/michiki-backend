@@ -11,6 +11,5 @@ public class MichikiApplication {
 
 		System.out.println('asd');
 	}
-
 }
 
