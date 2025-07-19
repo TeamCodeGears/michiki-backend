@@ -9,5 +9,5 @@ public class MichikiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MichikiApplication.class, args);
 	}
-
 }
+
