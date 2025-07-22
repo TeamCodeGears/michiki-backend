@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: "jdbc:oracle:thin:@localhost:1521:XE"
-    username: system
-    password: oracle
+    url: "jdbc:oracle:thin:@database-1.ctmkmo062uiz.ap-northeast-2.rds.amazonaws.com:1521:orcl"
+    username: ${ORACLE_RDS_USERNAME}
+    password: ${ORACLE_RDS_PASSWORD}
     hikari:
       maximum-pool-size: 3
       minimum-idle: 1
@@ -12,15 +12,16 @@ spring:
       test-on-borrow: true
       test-while-idle: true
       validation-query: "SELECT 1 FROM DUAL"
-      jpa:
-        database-platform: org.hibernate.dialect.OracleDialect
-        hibernate:
-          ddl-auto: validate
-        show-sql: true
-        properties:
-          hibernate:
-            format_sql: true
-            use_sql_comments: true
+
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
       mvc:
         view:
           suffix: .html

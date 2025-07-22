@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 기본 콘솔 appender (MDC 없음) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- MDC가 포함된 appender (요청 로그용) -->
+    <appender name="MDC_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] [%X{UUID:-}][%X{RequestPath:-}] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- DispatcherServlet 초기화 로그 숨기기 -->
+    <logger name="org.apache.catalina.core" level="WARN"/>
+    <logger name="org.springframework.web.servlet.DispatcherServlet" level="WARN"/>
+
+    <!-- MDCInterceptor만 MDC 패턴 사용 -->
+    <logger name="com.michiki.michiki.common.mdc.MDCInterceptor" level="INFO" additivity="false">
+        <appender-ref ref="MDC_CONSOLE"/>
+    </logger>
+
+    <!-- 나머지 모든 로그는 기본 패턴 사용 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
