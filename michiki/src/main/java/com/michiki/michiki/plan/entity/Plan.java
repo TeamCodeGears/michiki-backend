@@ -2,6 +2,7 @@ package com.michiki.michiki.plan.entity;
 
 import com.michiki.michiki.common.BaseEntity;
 import com.michiki.michiki.member.entity.Member;
+import com.michiki.michiki.place.entity.Place;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.Length;
 
+import java.util.List;
 import java.time.LocalDate;
 
 @Getter
@@ -39,5 +41,10 @@ public class Plan extends BaseEntity {
     @Column(name = "SHARE_URI", length = 255, nullable = false)
     private String shareURI;
 
-    //@OneToMany()
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Place> places;
+
+    public void updateShareURI(String uri) {
+        this.shareURI = uri;
+    }
 }
