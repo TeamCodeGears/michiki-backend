@@ -1,7 +1,7 @@
 package com.michiki.michiki.place.entity;
 
 import com.michiki.michiki.common.BaseEntity;
-import com.michiki.michiki.user.entity.Member;
+import com.michiki.michiki.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

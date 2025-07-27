@@ -1,7 +1,7 @@
-package com.michiki.michiki.user.entity;
+package com.michiki.michiki.member.entity;
 
 import com.michiki.michiki.place.entity.Place;
-import com.michiki.michiki.user.type.SocialType;
+import com.michiki.michiki.member.type.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
