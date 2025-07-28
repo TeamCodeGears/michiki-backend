@@ -2,6 +2,7 @@ package com.michiki.michiki.place.entity;
 
 import com.michiki.michiki.common.BaseEntity;
 import com.michiki.michiki.member.entity.Member;
+import com.michiki.michiki.plan.entity.Plan;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,9 +33,9 @@ public class Place extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "plan_id", nullable = false)
-//    private Plan plan;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan plan;
 
     @Column(name = "NAME", length = 255)
     private String name;
