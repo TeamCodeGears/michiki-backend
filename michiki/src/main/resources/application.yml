@@ -26,6 +26,7 @@ spring:
         view:
           suffix: .html
 
+
 jwt:
   # 32글자 이상 인코딩된 문자열: oauthserversecretaccesstokenoauthserversecretaccesstokenoauthserversecretaccesstoken
   secret: b2F1dGhzZXJ2ZXJzZWNyZXRhY2Nlc3N0b2tlbm9hdXRoc2VydmVyc2VjcmV0YWNjZXNzdG9rZW5vYXV0aHNlcnZlcnNlY3JldGFjY2Vzc3Rva2Vu
