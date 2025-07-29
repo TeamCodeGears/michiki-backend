@@ -86,7 +86,6 @@ public class MemberController {
                             schema = @Schema(implementation = Map.class))),
             @ApiResponse(responseCode = "401", description = "권한 인증 실패")
     })
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorization) {
         // Bearer 토큰에서 실제 토큰 값만 추출
@@ -102,6 +101,12 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자의 회원 탈퇴를 진행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "회원 정보가 존재하지 않음")
+    })
     @PostMapping("/withdraw")
     public ResponseEntity<Map<String, String>> withdraw(
             @AuthenticationPrincipal UserDetails userDetails

@@ -1,6 +1,7 @@
 package com.michiki.michiki.member.service;
 
 import com.michiki.michiki.common.auth.service.RefreshTokenService;
+import com.michiki.michiki.common.exception.MemberNotFoundException;
 import com.michiki.michiki.member.MemberRepository;
 import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.member.type.SocialType;
@@ -38,6 +39,6 @@ public class MemberService {
 
     public Member findByMember(String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("회원이 존재하지 않습니다."));
     }
 }

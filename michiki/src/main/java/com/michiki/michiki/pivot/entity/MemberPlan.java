@@ -27,11 +27,6 @@ public class MemberPlan {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "HOST_ID", nullable = false)
-    private Member host;
-
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PLAN_ID", nullable = false)
     private Plan plan;
 

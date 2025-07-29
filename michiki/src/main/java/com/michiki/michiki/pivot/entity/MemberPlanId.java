@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberPlanId implements java.io.Serializable{
     private Long member;
-    private Long host;
     private Long plan;
 }
