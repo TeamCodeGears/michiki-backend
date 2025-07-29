@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -84,7 +86,6 @@ public class MemberController {
                             schema = @Schema(implementation = Map.class))),
             @ApiResponse(responseCode = "401", description = "권한 인증 실패")
     })
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorization) {
         // Bearer 토큰에서 실제 토큰 값만 추출
@@ -98,5 +99,21 @@ public class MemberController {
         response.put("message", "로그아웃 성공");
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자의 회원 탈퇴를 진행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "회원 정보가 존재하지 않음")
+    })
+    @PostMapping("/withdraw")
+    public ResponseEntity<Map<String, String>> withdraw(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String email = userDetails.getUsername();
+        memberService.withdrawByEmail(email);
+        return ResponseEntity.ok(Map.of("message", "회원탈퇴 성공"));
+
     }
 }
