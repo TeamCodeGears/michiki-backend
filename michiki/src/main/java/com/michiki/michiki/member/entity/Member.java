@@ -1,5 +1,6 @@
 package com.michiki.michiki.member.entity;
 
+import com.michiki.michiki.pivot.entity.MemberPlan;
 import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.member.type.SocialType;
 import jakarta.persistence.*;
@@ -54,4 +55,7 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Place> places = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberPlan> plans;
 }

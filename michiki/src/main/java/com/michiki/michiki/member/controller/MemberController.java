@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -98,5 +100,15 @@ public class MemberController {
         response.put("message", "로그아웃 성공");
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<Map<String, String>> withdraw(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String email = userDetails.getUsername();
+        memberService.withdrawByEmail(email);
+        return ResponseEntity.ok(Map.of("message", "회원탈퇴 성공"));
+
     }
 }
