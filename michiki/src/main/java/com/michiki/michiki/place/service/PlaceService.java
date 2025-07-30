@@ -4,7 +4,7 @@ package com.michiki.michiki.place.service;
 import com.michiki.michiki.common.exception.MemberNotFoundException;
 import com.michiki.michiki.common.exception.NotParticipatingMemberException;
 import com.michiki.michiki.common.exception.PlanNotFoundException;
-import com.michiki.michiki.member.MemberRepository;
+import com.michiki.michiki.member.repository.MemberRepository;
 import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.place.dto.PlaceRequestDto;
 import com.michiki.michiki.place.entity.Place;
