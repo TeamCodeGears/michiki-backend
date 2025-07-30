@@ -1,4 +1,4 @@
-package com.michiki.michiki.member;
+package com.michiki.michiki.member.repository;
 
 import com.michiki.michiki.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;

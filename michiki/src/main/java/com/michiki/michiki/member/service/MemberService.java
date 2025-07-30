@@ -2,7 +2,7 @@ package com.michiki.michiki.member.service;
 
 import com.michiki.michiki.common.auth.service.RefreshTokenService;
 import com.michiki.michiki.common.exception.MemberNotFoundException;
-import com.michiki.michiki.member.MemberRepository;
+import com.michiki.michiki.member.repository.MemberRepository;
 import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.member.type.SocialType;
 import lombok.RequiredArgsConstructor;
