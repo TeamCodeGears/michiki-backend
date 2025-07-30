@@ -27,16 +27,16 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                // 빌드 산출물을 서비스 디렉터리로 복사
-                sh '''
-                  cp michiki/build/libs/*.jar /home/ec2-user/michiki-backend/michiki.jar
-                  # (권한이 필요하면) chown ec2-user:ec2-user /home/ec2-user/michiki-backend/michiki.jar
+          steps {
+            // workspace 루트에서 pull
+            sh 'git pull origin main'
 
-                  # sudoers에 비밀번호 없이 허용된 명령으로 서비스 재시작
-                  sudo systemctl restart michiki.service
-                '''
-            }
+            // 빌드 아티팩트 복사 (sudo cp)
+            sh 'sudo cp michiki/build/libs/michiki-0.0.1-SNAPSHOT.jar /home/ec2-user/michiki-backend/michiki.jar'
+
+            // 서비스 재시작
+            sh 'sudo systemctl restart michiki.service'
+          }
         }
     }
 
