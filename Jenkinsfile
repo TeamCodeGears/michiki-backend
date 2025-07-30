@@ -28,17 +28,14 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // 워크스페이스 루트에서 pull
-                sh 'git pull origin main'
+                // 빌드 산출물을 서비스 디렉터리로 복사
+                sh '''
+                  cp michiki/build/libs/*.jar /home/ec2-user/michiki-backend/michiki.jar
+                  # (권한이 필요하면) chown ec2-user:ec2-user /home/ec2-user/michiki-backend/michiki.jar
 
-                // 다시 subproject 빌드
-                dir('michiki') {
-                    sh 'chmod +x gradlew'
-                    sh './gradlew clean build -x test'
-                }
-
-                // 서비스 재시작 (jenkins 유저가 sudoers에 등록되어 있어야 함)
-                sh 'sudo systemctl restart michiki.service'
+                  # sudoers에 비밀번호 없이 허용된 명령으로 서비스 재시작
+                  sudo systemctl restart michiki.service
+                '''
             }
         }
     }
@@ -82,4 +79,5 @@ pipeline {
         }
     }
 }
+
 
