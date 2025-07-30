@@ -19,12 +19,15 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // 빌드 산출물 (*.jar) 복사
-                sh """
-                  sudo cp ${env.WORKSPACE}/michiki/build/libs/*.jar \
-                         /home/ec2-user/michiki-backend/michiki.jar
-                  sudo systemctl restart michiki.service
-                """
+                // 실제 JAR 파일 경로를 뽑아서 변수에 저장한 뒤 복사
+                                sh '''
+                                  # plain 버전 제외한 실행용 JAR 파일 하나만 골라서 변수에 담기
+                                  JAR=$(ls ${WORKSPACE}/michiki/build/libs/*SNAPSHOT.jar | grep -v plain)
+
+                                  echo "Deploying $JAR"
+                                  sudo cp "$JAR" /home/ec2-user/michiki-backend/michiki.jar
+                                  sudo systemctl restart michiki.service
+                                '''
             }
         }
     }
