@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@Tag(name = "계획 API", description = "계획 생성, 삭제, 수정 등PI")
+@Tag(name = "장소 API", description = "장소 생성, 삭제, 수정 등PI")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/plans")
