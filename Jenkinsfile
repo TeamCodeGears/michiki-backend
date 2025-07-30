@@ -19,15 +19,20 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // 실제 JAR 파일 경로를 뽑아서 변수에 저장한 뒤 복사
-                                sh '''
-                                  # plain 버전 제외한 실행용 JAR 파일 하나만 골라서 변수에 담기
-                                  JAR=$(ls ${WORKSPACE}/michiki/build/libs/*SNAPSHOT.jar | grep -v plain)
+                sh '''
+                  # 1) 서비스 디렉토리로 이동해서 최신 소스 받아오기
+                  cd /home/ec2-user/michiki-backend
+                  git pull origin main
 
-                                  echo "Deploying $JAR"
-                                  sudo cp "$JAR" /home/ec2-user/michiki-backend/michiki.jar
-                                  sudo systemctl restart michiki.service
-                                '''
+                  # 2) 워크스페이스에서 방금 빌드된 JAR 경로 추출 (plain 없이)
+                  JAR=$(ls ${WORKSPACE}/michiki/build/libs/*SNAPSHOT.jar | grep -v plain)
+                  echo "Deploying $JAR"
+
+                  # 3) 복사 & 서비스 재시작
+                  sudo cp "$JAR" /home/ec2-user/michiki-backend/michiki.jar
+                  sudo systemctl restart michiki.service
+                '''
+
             }
         }
     }
