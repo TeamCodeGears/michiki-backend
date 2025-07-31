@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Map;
 
@@ -85,4 +86,23 @@ class MemberControllerTest {
         verify(refreshTokenService).deleteRefreshToken(email);
     }
 
+    @Test
+    void withdraw_Success() {
+        // 준비: UserDetails 목킹
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getUsername()).thenReturn("test@example.com");
+
+        // memberService.withdrawByEmail은 void이므로 특별한 설정 불필요(doNothing 기본)
+
+        // 실행
+        ResponseEntity<?> response = memberController.withdraw(userDetails);
+
+        // 검증: HTTP 200, 메시지
+        @SuppressWarnings("unchecked")
+        Map<String, String> body = (Map<String, String>) response.getBody();
+        assertEquals("회원탈퇴 성공", body.get("message"));
+
+        // 서비스 호출 검증
+        verify(memberService).withdrawByEmail("test@example.com");
+    }
 }
