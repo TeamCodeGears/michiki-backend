@@ -6,10 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 public class PlaceReorderRequestDto {
+
+    @NotNull
+    private LocalDate travelDate;
 
     @NotEmpty
     private List<PlaceOrder> places;

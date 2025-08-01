@@ -73,9 +73,14 @@ public class PlaceService {
 
         memberValidate(memberId, plan);
 
+        List<Place> placesOfDay = placeRepository.findByPlanAndTravelDate(plan, dto.getTravelDate());
+
         List<Place> updated = dto.getPlaces().stream()
                 .map(o -> {
-                    Place place = getPlace(plan, o.getPlaceId());
+                    Place place = placesOfDay.stream()
+                            .filter(p -> p.getPlaceId().equals(o.getPlaceId()))
+                            .findFirst()
+                            .orElseThrow(() -> new PlaceNotFoundException("해당 날짜에 장소가 없습니다."));
                     place.changeOrderInDay(o.getOrderInDay());
                     return place;
                 })
