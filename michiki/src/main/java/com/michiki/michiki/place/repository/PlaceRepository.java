@@ -1,7 +1,12 @@
 package com.michiki.michiki.place.repository;
 
 import com.michiki.michiki.place.entity.Place;
+import com.michiki.michiki.plan.entity.Plan;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface PlaceRepository extends JpaRepository<Place, Long> {
+    Optional<Place> findByPlanAndPlaceId(Plan plan, @NotNull Long placeId);
 }
