@@ -76,7 +76,6 @@ public class PlaceService {
         List<Place> updated = dto.getPlaces().stream()
                 .map(o -> {
                     Place place = getPlace(plan, o.getPlaceId());
-                    place.changeTravelDate(dto.getTravelDate());
                     place.changeOrderInDay(o.getOrderInDay());
                     return place;
                 })

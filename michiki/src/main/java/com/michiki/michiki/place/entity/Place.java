@@ -63,10 +63,6 @@ public class Place extends BaseEntity {
         this.description = description;
     }
 
-    public void changeTravelDate(@NotNull LocalDate travelDate) {
-        this.travelDate = travelDate;
-    }
-
     public void changeOrderInDay(@NotNull Integer orderInDay) {
         this.orderInDay = orderInDay;
     }
