@@ -4,6 +4,7 @@ import com.michiki.michiki.common.BaseEntity;
 import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.plan.entity.Plan;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,7 +38,7 @@ public class Place extends BaseEntity {
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
 
-    @Column(name = "NAME", length = 255)
+    @Column(name = "NAME")
     private String name;
 
     @Column(name = "DESCRIPTION", length = 500)
@@ -49,7 +50,7 @@ public class Place extends BaseEntity {
     @Column(name = "LONGITUDE", precision = 9, scale = 6, nullable = false)
     private BigDecimal longitude;
 
-    @Column(name = "GOOGLE_PLACE_ID", length = 255)
+    @Column(name = "GOOGLE_PLACE_ID")
     private String googlePlaceId;
 
     @Column(name = "TRAVEL_DATE", nullable = false)
@@ -57,4 +58,16 @@ public class Place extends BaseEntity {
 
     @Column(name = "ORDER_IN_DAY", nullable = false)
     private Integer orderInDay;
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
+    public void changeTravelDate(@NotNull LocalDate travelDate) {
+        this.travelDate = travelDate;
+    }
+
+    public void changeOrderInDay(@NotNull Integer orderInDay) {
+        this.orderInDay = orderInDay;
+    }
 }
