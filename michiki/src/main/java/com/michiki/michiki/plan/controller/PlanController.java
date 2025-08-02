@@ -27,7 +27,8 @@ public class PlanController {
     public ResponseEntity<List<PlanResponseDto>> getPlansByStartYear(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody YearRequestDto yearRequestDto) {
-        Long memberId = getMemberId(userDetails);
+        String email = userDetails.getUsername();
+        Long memberId = memberService.findByMember(email).getMemberId();
         List<PlanResponseDto> plans = planService.getPlansStartInYear(memberId, yearRequestDto.getYear());
         return ResponseEntity.ok(plans);
     }
