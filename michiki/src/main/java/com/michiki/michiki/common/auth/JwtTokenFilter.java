@@ -1,14 +1,12 @@
 package com.michiki.michiki.common.auth;
 
+import com.michiki.michiki.common.exception.TokenAuthenticationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -27,7 +25,6 @@ public class JwtTokenFilter extends GenericFilter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         String path = httpServletRequest.getRequestURI();
 
@@ -42,7 +39,7 @@ public class JwtTokenFilter extends GenericFilter {
         try {
             if (token != null) {
                 if (!token.startsWith("Bearer ")) {
-                    throw new AuthenticationServiceException("Bearer 형식 아닙니다.");
+                    throw new TokenAuthenticationException("Bearer 형식 아닙니다.");
                 }
                 String jwtToken = token.substring(7);
                 // token 검증 및 claims(payload) 추출
@@ -59,9 +56,7 @@ public class JwtTokenFilter extends GenericFilter {
             chain.doFilter(request, response);
         } catch (Exception e) {
             log.info("exception: {}", e.getMessage());
-            httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-            httpServletResponse.setContentType("application/json");
-            httpServletResponse.getWriter().write("invalid token");
+            throw new TokenAuthenticationException("유효하지 않은 토큰입니다.");
         }
     }
 }
