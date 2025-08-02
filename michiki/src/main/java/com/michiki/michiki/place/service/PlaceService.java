@@ -7,10 +7,7 @@ import com.michiki.michiki.common.exception.PlaceNotFoundException;
 import com.michiki.michiki.common.exception.PlanNotFoundException;
 import com.michiki.michiki.member.repository.MemberRepository;
 import com.michiki.michiki.member.entity.Member;
-import com.michiki.michiki.place.dto.PlaceReorderRequestDto;
-import com.michiki.michiki.place.dto.PlaceRequestDto;
-import com.michiki.michiki.place.dto.PlaceResponseDto;
-import com.michiki.michiki.place.dto.PlaceUpdateRequestDto;
+import com.michiki.michiki.place.dto.*;
 import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
 import com.michiki.michiki.plan.entity.Plan;
@@ -88,6 +85,28 @@ public class PlaceService {
 
         return updated.stream()
                 .sorted(Comparator.comparing(Place::getOrderInDay))
+                .map(PlaceResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PlaceResponseDto> getRecommendedPlaces(Long memberId, Long planId, PlaceRecommendationRequestDto requestDto)
+    {
+        Plan plan = getPlan(planId);
+        memberValidate(memberId, plan);
+
+        double range = 0.1;
+
+        List<Place> filtered = placeRepository.findByPlan(plan).stream()
+                .filter(place -> {
+                    double lat = place.getLatitude().doubleValue();
+                    double lng = place.getLongitude().doubleValue();
+                    return Math.abs(lat - requestDto.getCenterLatitude()) <= range &&
+                            Math.abs(lng - requestDto.getCenterLongitude()) <= range;
+                })
+                .toList();
+
+        return filtered.stream()
                 .map(PlaceResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
