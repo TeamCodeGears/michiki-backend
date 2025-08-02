@@ -148,7 +148,7 @@ public class PlaceController {
     ) {
         Long memberId = getMemberId(userDetails);
         List<PlaceResponseDto> recommendations =
-                placeService.getRecommendedPlaces(memberId, planId, requestDto);
+                placeService.recommendPlaces(memberId, planId, requestDto);
         return ResponseEntity.ok(recommendations);
     }
 
@@ -157,3 +157,5 @@ public class PlaceController {
         return memberService.findByMember(email).getMemberId();
     }
 }
+
+
