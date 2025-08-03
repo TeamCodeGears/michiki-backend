@@ -1,6 +1,7 @@
 package com.michiki.michiki.plan.controller;
 
 import com.michiki.michiki.member.service.MemberService;
+import com.michiki.michiki.plan.dto.ChangeColorRequestDto;
 import com.michiki.michiki.plan.dto.PlanResponseDto;
 import com.michiki.michiki.plan.dto.YearRequestDto;
 import com.michiki.michiki.plan.service.PlanService;
@@ -42,9 +43,23 @@ public class PlanController {
         return ResponseEntity.ok(Map.of("message", "방" + message + " 성공"));
     }
 
+
+
+    @PostMapping("/{planId}/newColor")
+    public ResponseEntity<Map<String, String>> changeColor(
+            @PathVariable Long planId,
+            @Valid @RequestBody ChangeColorRequestDto changeColorRequestDto,
+            @AuthenticationPrincipal UserDetails userDetails
+            ){
+        Long memberId = getMemberId(userDetails);
+        planService.changeColor(memberId, planId, changeColorRequestDto.getColor());
+        return ResponseEntity.ok(Map.of("message", "변경 성공"));
+
+
+    }
+
     private Long getMemberId(UserDetails userDetails) {
         String email = userDetails.getUsername();
         return memberService.findByMember(email).getMemberId();
     }
-
 }

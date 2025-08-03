@@ -35,4 +35,8 @@ public class MemberPlan {
 
     @Column(name = "joined_at", nullable = false, updatable = false)
     private LocalDateTime joinedAt;
+
+    public void changeColor (String newColor) {
+        this.color = newColor;
+    }
 }

@@ -6,6 +6,7 @@ import com.michiki.michiki.common.exception.PlanNotFoundException;
 import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.member.repository.MemberRepository;
 import com.michiki.michiki.pivot.entity.MemberPlan;
+import com.michiki.michiki.pivot.entity.repository.MemberPlanRepository;
 import com.michiki.michiki.plan.dto.PlanResponseDto;
 import com.michiki.michiki.plan.entity.Plan;
 import com.michiki.michiki.plan.repository.PlanRepository;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 public class PlanService {
 
+    private final MemberPlanRepository memberPlanRepository;
     private final MemberRepository memberRepository;
     private final PlanRepository planRepository;
 
@@ -49,6 +51,16 @@ public class PlanService {
             return "삭제";
         }
         return "나가기";
+    }
+
+    @Transactional
+    public void changeColor(Long memberId, Long planId, String newColor) {
+        Member member = getMember(memberId);
+        Plan plan = getPlan(planId);
+
+        MemberPlan memberPlan = memberPlanRepository.findByMemberAndPlan(member, plan).
+                orElseThrow(() -> new NotParticipatingMemberException("해당 계획에 참여중이 아닙니다."));
+        memberPlan.changeColor(newColor);
     }
 
     private Member getMember(Long memberId) {
