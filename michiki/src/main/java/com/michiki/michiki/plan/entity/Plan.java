@@ -1,7 +1,6 @@
 package com.michiki.michiki.plan.entity;
 
 import com.michiki.michiki.common.BaseEntity;
-import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.pivot.entity.MemberPlan;
 import com.michiki.michiki.place.entity.Place;
 import jakarta.persistence.*;
@@ -9,9 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Table(name = "PLANS")
@@ -48,15 +48,22 @@ public class Plan extends BaseEntity {
     private LocalDateTime shareUriExpiresAt;
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Place> places;
+
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberPlan> memberPlans;
 
-    public void updateShareURI(String uri, LocalDateTime expiresAt) {
-        this.shareURI = uri;
-        this.shareUriExpiresAt = expiresAt;
+    public LocalDateTime getShareUriExpiresAt() {
+        return this.shareUriExpiresAt;
     }
 
     public void clearShareURI() {
         this.shareURI = null;
         this.shareUriExpiresAt = null;
+    }
+
+    public void updateShareURI(String token, LocalDateTime expiresAt) {
+        this.shareURI = token;
+        this.shareUriExpiresAt = expiresAt;
     }
 }

@@ -32,4 +32,8 @@ public class MemberPlan {
 
     @Column(name = "color", nullable = false, length = 16)
     private String color;
+
+    public void changeColor (String newColor) {
+        this.color = newColor;
+    }
 }

@@ -1,15 +1,17 @@
 package com.michiki.michiki.plan.controller;
 
 import com.michiki.michiki.member.service.MemberService;
+import com.michiki.michiki.plan.dto.ChangeColorRequestDto;
+import com.michiki.michiki.plan.dto.MemberOnlineStatusDto;
 import com.michiki.michiki.plan.dto.PlanResponseDto;
 import com.michiki.michiki.plan.dto.YearRequestDto;
 import com.michiki.michiki.plan.service.PlanService;
-import com.michiki.michiki.plan.dto.MemberOnlineStatusDto;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +29,7 @@ public class PlanController {
     public ResponseEntity<List<PlanResponseDto>> getPlansByStartYear(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody YearRequestDto yearRequestDto) {
-        String email = userDetails.getUsername();
-        Long memberId = memberService.findByMember(email).getMemberId();
+        Long memberId = getMemberId(userDetails);
         List<PlanResponseDto> plans = planService.getPlansStartInYear(memberId, yearRequestDto.getYear());
         return ResponseEntity.ok(plans);
     }
@@ -39,7 +40,7 @@ public class PlanController {
         List<MemberOnlineStatusDto> onlineMembers = planService.getOnlineMembers(planId);
         return ResponseEntity.ok(onlineMembers);
     }
-    // 공유 URI
+
     @PostMapping("/{planId}/share")
     public ResponseEntity<Map<String, String>> sharePlan(
             @PathVariable Long planId,
@@ -62,5 +63,9 @@ public class PlanController {
             @AuthenticationPrincipal UserDetails userDetails){
         Map<String, Object> status = planService.getShareStatus(planId, userDetails.getUsername());
         return ResponseEntity.ok(status);
+    }
+
+    private Long getMemberId(UserDetails userDetails) {
+        return Long.parseLong(userDetails.getUsername());
     }
 }
