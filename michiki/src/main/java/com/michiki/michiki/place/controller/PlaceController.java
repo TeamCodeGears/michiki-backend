@@ -1,10 +1,7 @@
 package com.michiki.michiki.place.controller;
 
 import com.michiki.michiki.member.service.MemberService;
-import com.michiki.michiki.place.dto.PlaceReorderRequestDto;
-import com.michiki.michiki.place.dto.PlaceRequestDto;
-import com.michiki.michiki.place.dto.PlaceResponseDto;
-import com.michiki.michiki.place.dto.PlaceUpdateRequestDto;
+import com.michiki.michiki.place.dto.*;
 import com.michiki.michiki.place.service.PlaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,15 +44,15 @@ public class PlaceController {
             @PathVariable Long planId,
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody PlaceRequestDto placeRequestDto
-            ) {
+    ) {
         placeService.addPlace(planId, getMemberId(userDetails), placeRequestDto);
         return ResponseEntity.ok(Map.of("message", "장소 등록 성공"));
     }
 
     @Operation(
-            summary      = "장소 수정",
-            description  = "planId 와 로그인한 멤버 정보를 바탕으로 특정 장소의 설명을 수정합니다.",
-            security     = @SecurityRequirement(name = "bearerAuth")
+            summary = "장소 수정",
+            description = "planId 와 로그인한 멤버 정보를 바탕으로 특정 장소의 설명을 수정합니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공",
@@ -77,9 +74,9 @@ public class PlaceController {
     }
 
     @Operation(
-            summary     = "장소 삭제",
+            summary = "장소 삭제",
             description = "planId 와 로그인한 멤버 정보를 바탕으로 해당 계획의 모든 장소를 삭제합니다.",
-            security    = @SecurityRequirement(name = "bearerAuth")
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "삭제 성공",
@@ -101,9 +98,9 @@ public class PlaceController {
     }
 
     @Operation(
-            summary     = "장소 순서 재정렬",
+            summary = "장소 순서 재정렬",
             description = "travelDate 별로 들어온 순서대로 orderInDay 를 업데이트하고, 재정렬된 장소 리스트를 반환합니다.",
-            security    = @SecurityRequirement(name = "bearerAuth")
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공",
@@ -126,9 +123,39 @@ public class PlaceController {
         return ResponseEntity.ok(reordered);
     }
 
+    @Operation(
+            summary = "추천 장소 목록 조회",
+            description = "줌 레벨과 중심 좌표를 기준으로 추천 장소 목록을 조회합니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "추천 장소 목록 반환",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PlaceResponseDto.class, type = "array")
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 계획")
+    })
+
+    @GetMapping("/{planId}/recommendations")
+    public ResponseEntity<List<PlaceResponseDto>> getRecommendedPlace(
+            @PathVariable Long planId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody PlaceRecommendationRequestDto requestDto
+    ) {
+        Long memberId = getMemberId(userDetails);
+        List<PlaceResponseDto> recommendations =
+                placeService.recommendPlaces(memberId, planId, requestDto);
+        return ResponseEntity.ok(recommendations);
+    }
+
     private Long getMemberId(UserDetails userDetails) {
         String email = userDetails.getUsername();
         return memberService.findByMember(email).getMemberId();
-
     }
 }
+
+

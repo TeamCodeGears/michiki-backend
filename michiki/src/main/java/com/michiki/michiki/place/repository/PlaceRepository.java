@@ -13,4 +13,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     Optional<Place> findByPlanAndPlaceId(Plan plan, @NotNull Long placeId);
 
     List<Place> findByPlanAndTravelDate(Plan plan, @NotNull LocalDate travelDate);
+
+    List<Place> findByPlan(Plan plan);
 }

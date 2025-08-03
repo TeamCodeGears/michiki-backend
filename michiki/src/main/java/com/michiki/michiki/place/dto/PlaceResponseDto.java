@@ -16,8 +16,9 @@ import java.time.LocalDate;
 public class PlaceResponseDto {
     private Long placeId;
     private Long memberId;
-    private Long planId;
+    private String googlePlaceId;
     private String name;
+    private String description;
     private BigDecimal latitude;
     private BigDecimal longitude;
     private LocalDate travelDate;
@@ -26,9 +27,10 @@ public class PlaceResponseDto {
     public static PlaceResponseDto fromEntity(Place place) {
        return PlaceResponseDto.builder()
                .placeId(place.getPlaceId())
+               .googlePlaceId(place.getGooglePlaceId())
                .memberId(place.getMember().getMemberId())
-               .planId(place.getPlan().getPlanId())
                .name(place.getName())
+               .description(place.getDescription())
                .latitude(place.getLatitude())
                .longitude(place.getLongitude())
                .travelDate(place.getTravelDate())

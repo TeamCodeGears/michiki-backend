@@ -7,5 +7,8 @@ import lombok.Data;
 public class PlaceUpdateRequestDto {
     @NotNull
     private Long placeId;
+    private String name;
     private String description;
+    private Double longitude;
+    private String googlePlaced;
 }
