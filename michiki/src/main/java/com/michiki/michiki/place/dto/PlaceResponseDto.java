@@ -13,6 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Data
+
+// 장소 정보를 클라이언트에 전달하기 위한 응답 Dto
 public class PlaceResponseDto {
     private Long placeId;
     private Long memberId;
@@ -24,6 +26,7 @@ public class PlaceResponseDto {
     private LocalDate travelDate;
     private Integer orderInDay;
 
+    // place entity를 Dto로 변환하는 정적 메서드
     public static PlaceResponseDto fromEntity(Place place) {
        return PlaceResponseDto.builder()
                .placeId(place.getPlaceId())
@@ -36,6 +39,5 @@ public class PlaceResponseDto {
                .travelDate(place.getTravelDate())
                .orderInDay(place.getOrderInDay())
                .build();
-
     }
 }

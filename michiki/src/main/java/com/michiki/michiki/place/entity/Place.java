@@ -26,43 +26,55 @@ import java.time.LocalDate;
 @Builder
 public class Place extends BaseEntity {
 
+    // 장소 ID
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "place_seq_gen")
     private Long placeId;
 
+    // 장소 등록한 유저
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    // 장소가 속한 여행 계획
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
 
+    // 장소 이름
     @Column(name = "NAME")
     private String name;
 
+    // 장소 설명
     @Column(name = "DESCRIPTION", length = 500)
     private String description;
 
+    // 위도
     @Column(name = "LATITUDE", precision = 9, scale = 6, nullable = false)
     private BigDecimal latitude;
 
+    // 경도
     @Column(name = "LONGITUDE", precision = 9, scale = 6, nullable = false)
     private BigDecimal longitude;
 
+    // 구글 지도 장소 ID
     @Column(name = "GOOGLE_PLACE_ID")
     private String googlePlaceId;
 
+    // 장소를 방문하는 날짜
     @Column(name = "TRAVEL_DATE", nullable = false)
     private LocalDate travelDate;
 
+    // 하루 안에 순서
     @Column(name = "ORDER_IN_DAY", nullable = false)
     private Integer orderInDay;
 
+    // 설명 수정 메서드
     public void changeDescription(String description) {
         this.description = description;
     }
 
+    // 일별 순서 변경 메서드
     public void changeOrderInDay(@NotNull Integer orderInDay) {
         this.orderInDay = orderInDay;
     }

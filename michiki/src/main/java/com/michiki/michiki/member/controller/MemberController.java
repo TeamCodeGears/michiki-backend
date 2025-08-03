@@ -31,12 +31,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/member")
+
+// 회원 인증 및 계정 관련 기능을 제공하는 컨트롤러
 public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
     private final GoogleService googleService;
     private final RefreshTokenService refreshTokenService;
 
+    // 구글 OAtuth 로그인 처리
     @Operation(summary = "구글 로그인",
             description = "구글 OAuth 인증코드를 사용하여 로그인 처리 및 JWT 액세스/리프레시 토큰 발급")
     @ApiResponses({
@@ -51,7 +54,7 @@ public class MemberController {
         // accessToken 발급
         AccessTokenDto accessTokenDto = googleService.getAccessToken(redirectDto.getCode());
 
-        // 사용자정보 얻기
+        // 유저 정보 얻기
         GoogleProfileDto googleProfileDto = googleService.getGoogleProfile(accessTokenDto.getAccessToken());
 
         // 회원가입이 되어 있지 않다면 회원가입
@@ -60,7 +63,7 @@ public class MemberController {
             originalMember = memberService.createOauth(googleProfileDto.getSub(), googleProfileDto.getEmail(), SocialType.GOOGLE);
         }
 
-        //회원 가입 되있는 회원이라면 토큰발급
+        //회원 가입 되있는 유저라면 토큰발급
         // 내부 JWT 토큰 발급 (액세스 토큰 + 리프레시 토큰)
         String accessToken = jwtTokenProvider.createAccessToken(originalMember.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(originalMember.getEmail());
@@ -68,6 +71,7 @@ public class MemberController {
         // 리프레시 토큰은 별도의 저장소에 저장해야 합니다 (DB 또는 Redis 등)
         refreshTokenService.saveRefreshToken(originalMember.getEmail(), refreshToken);
 
+        // 로그인 응답 반환
         Map<String, Object> loginInfo = new HashMap<>();
         loginInfo.put("id", originalMember.getMemberId());
         loginInfo.put("accessToken", accessToken);
@@ -77,7 +81,7 @@ public class MemberController {
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
     }
 
-
+    // 로그아웃 처리
     @Operation(summary = "로그아웃",
             description = "JWT 액세스 토큰을 사용해 로그아웃 처리 및 저장된 리프레시 토큰 삭제")
     @ApiResponses({
@@ -90,20 +94,24 @@ public class MemberController {
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorization) {
         // Bearer 토큰에서 실제 토큰 값만 추출
         String accessToken = authorization.substring(7);
+
+        // 유저 이메일 추출
         String email = jwtTokenProvider.validateToken(accessToken).getSubject();
 
         // 리프레시 토큰 삭제
         refreshTokenService.deleteRefreshToken(email);
 
+        // 응답 반환
         Map<String, String> response = new HashMap<>();
         response.put("message", "로그아웃 성공");
 
         return ResponseEntity.ok(response);
     }
 
+    // 회원 탈퇴 처리
     @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자의 회원 탈퇴를 진행합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공"),
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "회원 정보가 존재하지 않음")
     })
@@ -113,7 +121,7 @@ public class MemberController {
     ) {
         String email = userDetails.getUsername();
         memberService.withdrawByEmail(email);
-        return ResponseEntity.ok(Map.of("message", "회원탈퇴 성공"));
+        return ResponseEntity.ok(Map.of("message", "회원 탈퇴 성공"));
 
     }
 }

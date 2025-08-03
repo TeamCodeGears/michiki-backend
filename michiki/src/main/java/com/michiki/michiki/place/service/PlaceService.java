@@ -1,6 +1,5 @@
 package com.michiki.michiki.place.service;
 
-
 import com.michiki.michiki.common.exception.MemberNotFoundException;
 import com.michiki.michiki.common.exception.NotParticipatingMemberException;
 import com.michiki.michiki.common.exception.PlaceNotFoundException;
@@ -12,6 +11,7 @@ import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
 import com.michiki.michiki.plan.entity.Plan;
 import com.michiki.michiki.plan.repository.PlanRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
 @RequiredArgsConstructor
 @Service
 public class PlaceService {
@@ -28,6 +29,7 @@ public class PlaceService {
     private final PlanRepository planRepository;
     private final MemberRepository memberRepository;
 
+    // 장소 추가
     @Transactional
     public void addPlace(Long planId, Long memberId, PlaceRequestDto placeRequestDto) {
         Plan plan = getPlan(planId);
@@ -40,6 +42,7 @@ public class PlaceService {
         placeRepository.save(place);
     }
 
+    // 장소 설명 수정
     @Transactional(readOnly = true)
     public void updatePlace(Long memberId, Long planId, PlaceUpdateRequestDto dto) {
         Plan plan = getPlan(planId);
@@ -52,6 +55,7 @@ public class PlaceService {
         place.changeDescription(dto.getDescription());
     }
 
+    // 장소 삭제
     @Transactional
     public void deletePlace(Long memberId, Long planId, Long placeId) {
         Member member = getMember(memberId);
@@ -64,6 +68,7 @@ public class PlaceService {
         placeRepository.delete(place);
     }
 
+    // 장소 순서 정렬
     @Transactional
     public List<PlaceResponseDto> reorderPlaces(Long memberId, Long planId, PlaceReorderRequestDto dto) {
         Plan plan = getPlan(planId);
@@ -89,13 +94,14 @@ public class PlaceService {
                 .collect(Collectors.toList());
     }
 
+    // 추천 장소 목록 조회
     @Transactional(readOnly = true)
     public List<PlaceResponseDto> recommendPlaces(Long memberId, Long planId, PlaceRecommendationRequestDto dto) {
         Plan plan = getPlan(planId);
         memberValidate(memberId, plan);
 
         // 1. 추천 후보 장소를 가져온다 (예: 중심 좌표 + zoomLevel 기반 필터링)
-        List<Place> candidatePlaces = fetchCandidatePlaces(dto.getCenterLatitude(), dto.getCenterLongitude(), dto.getZoomLevel());
+        List<Place> candidatePlaces = fetchCandidatePlaces(dto.getCenterLatitude(), dto.getCenterLongitude(), dto.getZoomLevel().floatValue());
 
         // 2. 엔티티를 DTO로 매핑해서 반환
         return candidatePlaces.stream()
@@ -103,8 +109,8 @@ public class PlaceService {
                 .collect(Collectors.toList());
     }
 
-    // TODO: 실제 로직은 DB 쿼리나 외부 API 호출로 대체해야 한다.
-// 예시용으로 중심 좌표에서 일정 거리 이내인 더미 필터링을 해보는 형태로 만들면 이렇게 확장 가능하다.
+    // TODO: 실제 로직은 DB 쿼리나 외부 API 호출로 대체해야 한다.- 이거 수정 필요하다 특히 구글줌
+    // 예시용으로 중심 좌표에서 일정 거리 이내인 더미 필터링을 해보는 형태로 만들면 이렇게 확장 가능하다.
     private List<Place> fetchCandidatePlaces(Double centerLat, Double centerLng, Float zoomLevel) {
         // placeholder: 실제라면 zoomLevel을 기반으로 반경을 계산해서 DB에서 조건에 맞는 장소를 조회.
         // 예: zoomLevel이 클수록 더 좁은 반경 -> radius 계산 (여기서는 단순화)
@@ -140,6 +146,7 @@ public class PlaceService {
         return R * c;
     }
 
+    // 해당 유저가 해당 계획에 참여중인지 검증
     private static void memberValidate(Long memberId, Plan plan) {
         boolean participates = plan.getMemberPlans().stream()
                 .anyMatch(mp -> mp.getMember().getMemberId().equals(memberId));
@@ -148,6 +155,7 @@ public class PlaceService {
         }
     }
 
+    // place Entity 생성 헬퍼 메서드
     private static Place createPlace(PlaceRequestDto placeRequestDto, Plan plan, Member member) {
         return Place.builder()
                 .plan(plan)
@@ -162,18 +170,22 @@ public class PlaceService {
                 .build();
     }
 
+    // 유저 조회
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
     }
 
+    // 계획 조회
     private Plan getPlan(Long planId) {
         return planRepository.findById(planId)
                 .orElseThrow(() -> new PlanNotFoundException("존재하지 않는 계획입니다."));
     }
 
+    // 계획 기준 장소 조회
     private Place getPlace(Plan plan, Long placeId) {
         return placeRepository.findByPlanAndPlaceId(plan, placeId)
                 .orElseThrow(() -> new PlaceNotFoundException("해당 플랜에 장소가 없습니다."));
     }
+
 }
