@@ -9,12 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,9 +26,25 @@ public class PlanController {
     public ResponseEntity<List<PlanResponseDto>> getPlansByStartYear(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody YearRequestDto yearRequestDto) {
-        String email = userDetails.getUsername();
-        Long memberId = memberService.findByMember(email).getMemberId();
+        Long memberId = getMemberId(userDetails);
         List<PlanResponseDto> plans = planService.getPlansStartInYear(memberId, yearRequestDto.getYear());
         return ResponseEntity.ok(plans);
     }
+
+
+    @PostMapping("/{planId}")
+    public ResponseEntity<Map<String, String>> leavePlan(
+            @PathVariable Long planId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Long memberId = getMemberId(userDetails);
+        String message = planService.leavePlan(memberId, planId);
+        return ResponseEntity.ok(Map.of("message", "방" + message + " 성공"));
+    }
+
+    private Long getMemberId(UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        return memberService.findByMember(email).getMemberId();
+    }
+
 }

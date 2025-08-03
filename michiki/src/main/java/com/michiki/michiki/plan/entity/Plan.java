@@ -1,7 +1,6 @@
 package com.michiki.michiki.plan.entity;
 
 import com.michiki.michiki.common.BaseEntity;
-import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.pivot.entity.MemberPlan;
 import com.michiki.michiki.place.entity.Place;
 import jakarta.persistence.*;
@@ -25,11 +24,7 @@ public class Plan extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "plans_seq_gen")
     private Long planId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "HOST_ID", nullable = false)
-    private Member host;
-
-    @Column(name = "TITLE", length = 255, nullable = false)
+    @Column(name = "TITLE", nullable = false)
     private String title;
 
     @Column(name = "START_DATE")
@@ -38,7 +33,7 @@ public class Plan extends BaseEntity {
     @Column(name = "END_DATE")
     private LocalDate endDate;
 
-    @Column(name = "SHARE_URI", length = 255, nullable = false)
+    @Column(name = "SHARE_URI", nullable = false)
     private String shareURI;
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
