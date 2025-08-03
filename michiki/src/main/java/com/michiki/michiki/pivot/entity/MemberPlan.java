@@ -8,9 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-
 @Table(name = "members_plans_pivot")
 @IdClass(MemberPlanId.class)
 @Getter
@@ -32,9 +29,6 @@ public class MemberPlan {
 
     @Column(name = "color", nullable = false, length = 16)
     private String color;
-
-    @Column(name = "joined_at", nullable = false, updatable = false)
-    private LocalDateTime joinedAt;
 
     public void changeColor (String newColor) {
         this.color = newColor;
