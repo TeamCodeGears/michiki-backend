@@ -45,4 +45,5 @@ public class Plan extends BaseEntity {
     public void updateShareURI(String uri) {
         this.shareURI = uri;
     }
+
 }
