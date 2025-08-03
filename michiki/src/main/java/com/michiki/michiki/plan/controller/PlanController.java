@@ -84,6 +84,4 @@ public class PlanController {
         List<MemberOnlineStatusDto> onlineMembers = planService.getOnlineMembers(planId, username);
         return ResponseEntity.ok(onlineMembers);
     }
-
-
 }
