@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PlanRepository extends JpaRepository<Plan, Long> {
@@ -19,5 +20,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
             @Param("jan1") LocalDate jan1,
             @Param("dec31") LocalDate dec31
     );
+   Optional<Plan> findByShareURI(String shareURI);
 }
 

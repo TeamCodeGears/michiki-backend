@@ -14,5 +14,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     List<Place> findByPlanAndTravelDate(Plan plan, @NotNull LocalDate travelDate);
 
+    List<Place> findByPlanOrderByTravelDateAscOrderInDayAsc(Plan plan);
+
     List<Place> findByPlan(Plan plan);
 }

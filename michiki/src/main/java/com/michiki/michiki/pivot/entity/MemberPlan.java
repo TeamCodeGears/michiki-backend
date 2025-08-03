@@ -32,7 +32,4 @@ public class MemberPlan {
 
     @Column(name = "color", nullable = false, length = 16)
     private String color;
-
-    @Column(name = "joined_at", nullable = false, updatable = false)
-    private LocalDateTime joinedAt;
 }

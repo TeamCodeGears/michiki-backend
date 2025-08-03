@@ -12,6 +12,7 @@ import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
 import com.michiki.michiki.plan.entity.Plan;
 import com.michiki.michiki.plan.repository.PlanRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
 @RequiredArgsConstructor
 @Service
 public class PlaceService {
@@ -176,4 +178,5 @@ public class PlaceService {
         return placeRepository.findByPlanAndPlaceId(plan, placeId)
                 .orElseThrow(() -> new PlaceNotFoundException("해당 플랜에 장소가 없습니다."));
     }
+
 }

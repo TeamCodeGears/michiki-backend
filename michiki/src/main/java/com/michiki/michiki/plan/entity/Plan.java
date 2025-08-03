@@ -9,9 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Table(name = "PLANS")
@@ -21,13 +21,10 @@ import java.util.List;
 @Entity
 @SequenceGenerator(name = "plans_seq_gen", sequenceName = "PLANS_SEQ", allocationSize = 1)
 public class Plan extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "plans_seq_gen")
     private Long planId;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "HOST_ID", nullable = false)
-    private Member host;
 
     @Column(name = "TITLE", length = 255, nullable = false)
     private String title;
@@ -38,16 +35,28 @@ public class Plan extends BaseEntity {
     @Column(name = "END_DATE")
     private LocalDate endDate;
 
+    @Column(name = "CREATED_AT")
+    private LocalDateTime createdAt;
+
+    @Column(name = "UPDATED_AT")
+    private LocalDateTime updatedAt;
+
     @Column(name = "SHARE_URI", length = 255, nullable = false)
     private String shareURI;
 
-    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Place> places;
+    @Column(name = "SHARE_URI_EXPIRES_AT")
+    private LocalDateTime shareUriExpiresAt;
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberPlan> memberPlans;
 
-    public void updateShareURI(String uri) {
+    public void updateShareURI(String uri, LocalDateTime expiresAt) {
         this.shareURI = uri;
+        this.shareUriExpiresAt = expiresAt;
+    }
+
+    public void clearShareURI() {
+        this.shareURI = null;
+        this.shareUriExpiresAt = null;
     }
 }
