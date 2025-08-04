@@ -24,6 +24,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Place extends BaseEntity {
 
     // 장소 ID

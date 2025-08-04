@@ -121,40 +121,6 @@ public class PlanService {
                 .shareUri(plan.getShareURI()) // 필요시 포함
                 .build();
     }
-
-    // 공유 URI 생성 (24시간 유효)
-    @Transactional
-    public String generateShareUri(Long planId, String username) {
-        Plan plan = getPlan(planId);
-        validateParticipant(plan, username);
-        String token = UUID.randomUUID().toString();
-        LocalDateTime expiresAt = LocalDateTime.now().plusHours(24);
-        plan.updateShareURI(token, expiresAt);
-        planRepository.save(plan);
-        return "https://your-domain.com/share/" + token;
-    }
-
-    // 공유 URI 취소
-    @Transactional
-    public void cancelShareUri(Long planId, String username) {
-        Plan plan = getPlan(planId);
-        validateParticipant(plan, username);
-        plan.clearShareURI();
-        planRepository.save(plan);
-    }
-
-    // 공유 상태 및 만료시간 조회
-    @Transactional(readOnly = true)
-    public Map<String, Object> getShareStatus(Long planId, String username) {
-        Plan plan = getPlan(planId);
-        validateParticipant(plan, username);
-        boolean isShared = plan.getShareURI() != null && plan.getShareUriExpiresAt() != null;
-        return Map.of(
-                "isShared", isShared,
-                "expiresAt", plan.getShareUriExpiresAt()
-        );
-    }
-
     // 사용자 참여 여부 검증
     private void validateParticipant(Plan plan, String username) {
         boolean isParticipant = plan.getMemberPlans().stream()
