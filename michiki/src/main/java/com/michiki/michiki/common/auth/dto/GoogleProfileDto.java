@@ -13,4 +13,5 @@ public class GoogleProfileDto {
     private String sub;
     private String email;
     private String picture;
+    private String name;
 }

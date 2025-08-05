@@ -54,10 +54,20 @@ public class MemberController {
         // 사용자정보 얻기
         GoogleProfileDto googleProfileDto = googleService.getGoogleProfile(accessTokenDto.getAccessToken());
 
+        // nickname fallback (구글에서 name 없으면 email의 앞부분이나 timestamp 사용)
+        String nickname = googleProfileDto.getName();
+        if (nickname == null || nickname.isBlank()) {
+            if(googleProfileDto.getEmail() != null && googleProfileDto.getEmail().contains("@")) {
+                nickname = googleProfileDto.getEmail().split("@")[0];
+            } else {
+                nickname = "user_" + System.currentTimeMillis();
+            }
+        }
+
         // 회원가입이 되어 있지 않다면 회원가입
         Member originalMember = memberService.getMemberBySocialId(googleProfileDto.getSub());
         if (originalMember == null) {
-            originalMember = memberService.createOauth(googleProfileDto.getSub(), googleProfileDto.getEmail(), SocialType.GOOGLE);
+            originalMember = memberService.createOauth(googleProfileDto.getSub(), googleProfileDto.getEmail(), SocialType.GOOGLE, nickname);
         }
 
         //회원 가입 되있는 회원이라면 토큰발급

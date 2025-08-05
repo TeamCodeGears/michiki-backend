@@ -29,12 +29,13 @@ spring:
 
 jwt:
   # 32글자 이상 인코딩된 문자열: oauthserversecretaccesstokenoauthserversecretaccesstokenoauthserversecretaccesstoken
-  secret: b2F1dGhzZXJ2ZXJzZWNyZXRhY2Nlc3N0b2tlbm9hdXRoc2VydmVyc2VjcmV0YWNjZXNzdG9rZW5vYXV0aHNlcnZlcnNlY3JldGFjY2Vzc3Rva2Vu
-  access-expiration: 3000 #분단위
-  refresh-expiration: 43200 # 30일 (30 * 24 * 60 분)
+  secret: ${JWT_SECRET}
+  access-expiration: 30 #분단위
+  refresh-expiration: 20160 # 리프레시 토큰 만료: 14일 (14*24*60 = 20160분)
 
 oauth:
   google:
     client-id: ${GOOGLE_CLIENT_ID}
     client-secret: ${GOOGLE_CLIENT_SECRET}
-    redirect-uri: http://localhost:3000/oauth/google/redirect
+    redirect-uri: https://teamcodegears.github.io/michki-frontend/oauth/google/redirect
+#    redirect-uri: http://localhost:8080/oauth/google/redirect
