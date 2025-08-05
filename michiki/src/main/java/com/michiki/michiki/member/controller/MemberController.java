@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +31,7 @@ import java.util.Map;
 @Tag(name = "회원 API", description = "회원 로그인 및 로그아웃 API")
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/member")
 public class MemberController {
     private final MemberService memberService;
@@ -83,6 +85,8 @@ public class MemberController {
         loginInfo.put("accessToken", accessToken);
         loginInfo.put("refreshToken", refreshToken);
 
+        log.info("accessToken: " + accessToken);
+        log.info("refreshToken: " + refreshToken);
 
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
     }
