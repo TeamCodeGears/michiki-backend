@@ -3,7 +3,6 @@ package com.michiki.michiki.plan.controller;
 import com.michiki.michiki.member.service.MemberService;
 import com.michiki.michiki.plan.dto.ChangeColorRequestDto;
 import com.michiki.michiki.plan.dto.PlanResponseDto;
-import com.michiki.michiki.plan.dto.YearRequestDto;
 import com.michiki.michiki.plan.service.PlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +25,12 @@ public class PlanController {
     @GetMapping
     public ResponseEntity<List<PlanResponseDto>> getPlansByStartYear(
             @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody YearRequestDto yearRequestDto) {
+            @RequestParam int year) {
         Long memberId = getMemberId(userDetails);
-        List<PlanResponseDto> plans = planService.getPlansStartInYear(memberId, yearRequestDto.getYear());
+        List<PlanResponseDto> plans = planService.getPlansStartInYear(memberId, year);
+        if (plans.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(plans);
     }
 
