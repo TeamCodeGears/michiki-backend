@@ -50,7 +50,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "https://teamcodegears.github.io" ));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"
+                , "http://localhost:8080",
+                "https://teamcodegears.github.io" ));
         configuration.setAllowedMethods(List.of("*")); // 모든 HTTP 메서드 허용
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더값 허용
         configuration.setAllowCredentials(true); // 자격증명허용
