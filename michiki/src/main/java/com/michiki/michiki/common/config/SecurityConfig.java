@@ -38,6 +38,7 @@ public class SecurityConfig {
                         "/auth/refresh-token",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
+                        "/v3/api-docs",
                         "/v3/api-docs/**",
                         "/v3/api-docs.yaml",
                         "/swagger-ui/oauth2-redirect.html"
