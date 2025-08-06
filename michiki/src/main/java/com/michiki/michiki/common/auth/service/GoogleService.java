@@ -36,7 +36,8 @@ public class GoogleService {
         params.add("client_secret", googleClientSecret);
         params.add("redirect_uri", googleRedirectUri);
         params.add("grant_type", "authorization_code");
-       
+
+
         return restClient.post()
                 .uri("https://oauth2.googleapis.com/token")
                 .header("Content-Type", "application/x-www-form-urlencoded")

@@ -52,7 +52,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173"
                 ,"http://localhost:8080",
-                "https://teamcodegears.github.io/michki-frontend/" ));
+                "http://43.200.191.212:8080",
+                "https://teamcodegears.github.io",
+                "http://michiki.org",
+                "http://www.michiki.org"));
         configuration.setAllowedMethods(List.of("*")); // 모든 HTTP 메서드 허용
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더값 허용
         configuration.setAllowCredentials(true); // 자격증명허용
