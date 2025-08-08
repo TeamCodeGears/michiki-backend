@@ -1,6 +1,7 @@
 package com.michiki.michiki.common.auth.conroller;
 
 import com.michiki.michiki.common.auth.JwtTokenProvider;
+import com.michiki.michiki.common.auth.dto.RefreshRequest;
 import com.michiki.michiki.common.auth.service.RefreshTokenService;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,26 +37,26 @@ public class AuthController {
     })
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
+    public ResponseEntity<?> refreshAccessToken(@RequestBody RefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
         try {
             Claims claims = jwtTokenProvider.validateToken(refreshToken);
             String email = claims.getSubject();
 
-            // 저장소에 해당 리프레시 토큰 존재 및 유효한지 확인
             if (!refreshTokenService.isValidRefreshToken(email, refreshToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid refresh token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "invalid_refresh_token", "message", "저장소에 없는 또는 만료된 리프레시 토큰입니다."));
             }
 
             String accessToken = jwtTokenProvider.createAccessToken(email);
-            // 필요하면 새로운 리프래시 토큰 재발급하고 저장
+            // 필요시 새로운 refreshToken 재발급, 저장소 교체
 
             Map<String, String> tokens = new HashMap<>();
             tokens.put("accessToken", accessToken);
-
             return ResponseEntity.ok(tokens);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid refresh token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid_refresh_token", "message", "리프레시 토큰 검증 실패"));
         }
     }
 }

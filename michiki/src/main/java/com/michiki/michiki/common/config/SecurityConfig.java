@@ -34,10 +34,14 @@ public class SecurityConfig {
                 // 특정 url 패턴에 대해서는 인증처리(Authentication 객체생성) 재외
                 .authorizeHttpRequests(a -> a.requestMatchers(
                         "/member/google/login",
+                        "/oauth/google/redirect",
+                        "/auth/refresh-token",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
+                        "/v3/api-docs",
                         "/v3/api-docs/**",
-                        "/v3/api-docs.yaml"
+                        "/v3/api-docs.yaml",
+                        "/swagger-ui/oauth2-redirect.html"
                 ).permitAll().anyRequest().authenticated())
                 // UsernamePasswordAuthenticationFilter 이 클래스에서 플로그인 인증을 처리
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
@@ -47,7 +51,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"
+                ,"http://localhost:8080",
+                "http://43.200.191.212:8080",
+                "https://teamcodegears.github.io",
+                "http://michiki.org",
+                "http://www.michiki.org"));
         configuration.setAllowedMethods(List.of("*")); // 모든 HTTP 메서드 허용
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더값 허용
         configuration.setAllowCredentials(true); // 자격증명허용

@@ -2,6 +2,7 @@ package com.michiki.michiki.common.auth.service;
 
 import com.michiki.michiki.common.auth.dto.AccessTokenDto;
 import com.michiki.michiki.common.auth.dto.GoogleProfileDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+
+@Slf4j
 @Service
 public class GoogleService {
 
@@ -32,6 +36,7 @@ public class GoogleService {
         params.add("client_secret", googleClientSecret);
         params.add("redirect_uri", googleRedirectUri);
         params.add("grant_type", "authorization_code");
+
 
         return restClient.post()
                 .uri("https://oauth2.googleapis.com/token")
