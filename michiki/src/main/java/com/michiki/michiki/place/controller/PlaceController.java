@@ -150,7 +150,7 @@ public class PlaceController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 계획")
     })
 
-    @GetMapping("/{planId}/recommendations")
+    @PostMapping("/{planId}/recommendations")
     public ResponseEntity<List<PlaceResponseDto>> getRecommendedPlace(
             @PathVariable Long planId,
             @AuthenticationPrincipal UserDetails userDetails,
