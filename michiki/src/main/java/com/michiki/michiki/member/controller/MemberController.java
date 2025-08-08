@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +31,7 @@ import java.util.Map;
 @Tag(name = "회원 API", description = "회원 로그인 및 로그아웃 API")
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/member")
 
 // 회원 인증 및 계정 관련 기능을 제공하는 컨트롤러
@@ -57,10 +59,20 @@ public class MemberController {
         // 유저 정보 얻기
         GoogleProfileDto googleProfileDto = googleService.getGoogleProfile(accessTokenDto.getAccessToken());
 
+        // nickname fallback (구글에서 name 없으면 email의 앞부분이나 timestamp 사용)
+        String nickname = googleProfileDto.getName();
+        if (nickname == null || nickname.isBlank()) {
+            if(googleProfileDto.getEmail() != null && googleProfileDto.getEmail().contains("@")) {
+                nickname = googleProfileDto.getEmail().split("@")[0];
+            } else {
+                nickname = "user_" + System.currentTimeMillis();
+            }
+        }
+
         // 회원가입이 되어 있지 않다면 회원가입
         Member originalMember = memberService.getMemberBySocialId(googleProfileDto.getSub());
         if (originalMember == null) {
-            originalMember = memberService.createOauth(googleProfileDto.getSub(), googleProfileDto.getEmail(), SocialType.GOOGLE);
+            originalMember = memberService.createOauth(googleProfileDto.getSub(), googleProfileDto.getEmail(), SocialType.GOOGLE, nickname);
         }
 
         //회원 가입 되있는 유저라면 토큰발급
@@ -77,6 +89,8 @@ public class MemberController {
         loginInfo.put("accessToken", accessToken);
         loginInfo.put("refreshToken", refreshToken);
 
+        log.info("accessToken: " + accessToken);
+        log.info("refreshToken: " + refreshToken);
 
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
     }
