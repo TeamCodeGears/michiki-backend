@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "share_links")
 @Getter
+@SequenceGenerator(
+        name = "share_links_seq_gen",
+        sequenceName = "SHARE_LINKS_SEQ",
+        allocationSize = 1
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -18,7 +23,7 @@ public class ShareLink {
 
     // 공유 URI 고유 ID
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "share_links_seq_gen")
     private Long id;
 
     // 공유 대상이 되는 계획
