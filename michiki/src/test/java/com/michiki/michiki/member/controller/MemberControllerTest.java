@@ -53,7 +53,7 @@ class MemberControllerTest {
                 .thenReturn(new AccessTokenDto("access_token", null, null, null));
         when(googleService.getGoogleProfile(anyString())).thenReturn(new GoogleProfileDto("socialId", "email", null, null));
         when(memberService.getMemberBySocialId(anyString())).thenReturn(null);
-        when(memberService.createOauth(anyString(), anyString(), any(), any())).thenReturn(
+        when(memberService.createOauth(anyString(), anyString(), any(), any(), any())).thenReturn(
                 Member.builder().memberId(1L).email("email").build());
         when(jwtTokenProvider.createAccessToken(anyString())).thenReturn("accessToken");
         when(jwtTokenProvider.createRefreshToken(anyString())).thenReturn("refreshToken");
