@@ -20,12 +20,13 @@ public class MemberService {
         return memberRepository.findBySocialId(socialId).orElse(null);
     }
 
-    public Member createOauth(String socialId, String email, SocialType socialType, String nickName) {
+    public Member createOauth(String socialId, String email, SocialType socialType, String nickName, String profileImgUrl) {
         Member member = Member.builder()
                 .email(email)
                 .socialType(socialType)
                 .socialId(socialId)
                 .nickname(nickName)
+                .profileImage(profileImgUrl)
                 .build();
         memberRepository.save(member);
         return member;

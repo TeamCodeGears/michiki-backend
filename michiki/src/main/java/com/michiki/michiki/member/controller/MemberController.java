@@ -69,7 +69,7 @@ public class MemberController {
         // 회원가입이 되어 있지 않다면 회원가입
         Member originalMember = memberService.getMemberBySocialId(googleProfileDto.getSub());
         if (originalMember == null) {
-            originalMember = memberService.createOauth(googleProfileDto.getSub(), googleProfileDto.getEmail(), SocialType.GOOGLE, nickname);
+            originalMember = memberService.createOauth(googleProfileDto.getSub(), googleProfileDto.getEmail(), SocialType.GOOGLE, nickname, googleProfileDto.getPicture());
         }
 
         //회원 가입 되있는 회원이라면 토큰발급
@@ -87,6 +87,7 @@ public class MemberController {
 
         log.info("accessToken: " + accessToken);
         log.info("refreshToken: " + refreshToken);
+
 
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
     }
