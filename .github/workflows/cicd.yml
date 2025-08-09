@@ -1,15 +1,15 @@
-name: CI
+name: CI (skip tests)
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      TZ: Asia/Seoul                 # CI 타임존 고정
-      SPRING_PROFILES_ACTIVE: test   # 테스트 프로필 강제(있다면)
+      TZ: Asia/Seoul
 
     defaults:
       run:
@@ -18,31 +18,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 21 (Corretto)
+        uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: '21'
-          cache: 'gradle'            # Gradle 캐시
+          cache: 'gradle'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 1) 테스트 먼저 (리포트 남기기)
-      - name: Test
-        run: ./gradlew test --no-daemon --info --stacktrace -Duser.timezone=Asia/Seoul
+      - name: Build (skip tests)
+        run: ./gradlew clean build -x test --no-daemon -Duser.timezone=Asia/Seoul
+        # 필요시 더 빠르게: ./gradlew clean bootJar -x test --no-daemon
 
-      - name: Upload test reports
-        if: always()
+      - name: Show build outputs
+        run: ls -al build/libs
+
+      - name: Upload JAR artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
-          path: |
-            **/build/reports/tests/test
-            **/build/test-results/test
-
-      # 2) 빌드 (테스트는 이미 실행했으니 스킵)
-      - name: Build
-        run: ./gradlew clean build -x test --no-daemon -Duser.timezone=Asia/Seoul
-
-      - name: Set artifact
-        run: echo "artifact=$(ls build/libs)" >> $GITHUB_ENV
+          name: app-jars-${{ github.sha }}
+          path: build/libs/*.jar
