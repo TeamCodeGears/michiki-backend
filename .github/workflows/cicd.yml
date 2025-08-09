@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI
 
 on:
   push:
@@ -7,30 +7,42 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Seoul                 # CI 타임존 고정
+      SPRING_PROFILES_ACTIVE: test   # 테스트 프로필 강제(있다면)
+
+    defaults:
+      run:
+        working-directory: michiki
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: '21'
-      
+          cache: 'gradle'            # Gradle 캐시
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: michiki
 
-      - name: Build with Gradle
-        run: ./gradlew clean build
-        working-directory: michiki
+      # 1) 테스트 먼저 (리포트 남기기)
+      - name: Test
+        run: ./gradlew test --no-daemon --info --stacktrace -Duser.timezone=Asia/Seoul
 
-      - name: Get current time
-        uses: josStorer/get-current-time@v2.0.2
-        id: current-time
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          format: YYYY-MM-DDTHH-mm-ss
-          utcOffset: "+09:00"
+          name: test-reports
+          path: |
+            **/build/reports/tests/test
+            **/build/test-results/test
+
+      # 2) 빌드 (테스트는 이미 실행했으니 스킵)
+      - name: Build
+        run: ./gradlew clean build -x test --no-daemon -Duser.timezone=Asia/Seoul
 
       - name: Set artifact
-        run: echo "artifact=$(ls ./build/libs)" >> $GITHUB_ENV
-        working-directory: michiki
+        run: echo "artifact=$(ls build/libs)" >> $GITHUB_ENV
