@@ -12,14 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+
+// 회원 관련 비즈니스 로직을 담당하는 서비스 클래스
 public class MemberService {
     private final MemberRepository memberRepository;
     private final RefreshTokenService refreshTokenService;
 
+    // 소셜 ID 기준으로 회원 조회
     public Member getMemberBySocialId(String socialId) {
         return memberRepository.findBySocialId(socialId).orElse(null);
     }
 
+    // 소셜 로그인 기반 회원 생성
     public Member createOauth(String socialId, String email, SocialType socialType, String nickName, String profileImgUrl) {
         Member member = Member.builder()
                 .email(email)
@@ -32,6 +36,7 @@ public class MemberService {
         return member;
     }
 
+    // 회원 탈퇴 처리
     @Transactional
     public void withdrawByEmail(String email) {
         Member member = findByMember(email);
@@ -39,6 +44,7 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
+    // 이메일로 회원 조회
     public Member findByMember(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("회원이 존재하지 않습니다."));

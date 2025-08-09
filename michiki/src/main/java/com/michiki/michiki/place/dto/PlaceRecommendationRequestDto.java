@@ -8,12 +8,12 @@ import lombok.Setter;
 @Setter
 
 public class PlaceRecommendationRequestDto {
-    @NotNull
-    private Double centerLatitude;
+        @NotNull
+        private Double centerLatitude;
 
-    @NotNull
-    private Double centerLongitude;
+        @NotNull
+        private Double centerLongitude;
 
-    @NotNull
-    private Float zoomLevel;
+        @NotNull
+        private Integer zoomLevel;
 }
