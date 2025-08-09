@@ -24,12 +24,13 @@ public class MemberService {
     }
 
     // 소셜 로그인 기반 회원 생성
-    public Member createOauth(String socialId, String email, SocialType socialType, String nickName) {
+    public Member createOauth(String socialId, String email, SocialType socialType, String nickName, String profileImgUrl) {
         Member member = Member.builder()
                 .email(email)
                 .socialType(socialType)
                 .socialId(socialId)
                 .nickname(nickName)
+                .profileImage(profileImgUrl)
                 .build();
         memberRepository.save(member);
         return member;
