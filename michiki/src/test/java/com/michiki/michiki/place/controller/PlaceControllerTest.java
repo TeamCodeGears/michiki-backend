@@ -95,10 +95,9 @@ class PlaceControllerTest {
     @Test
     void updatePlace_Success() throws Exception {
         PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto();
-        dto.setPlaceId(10L);
         dto.setDescription("수정된 설명");
 
-        mockMvc.perform(put("/plans/{planId}/places", 1L)
+        mockMvc.perform(put("/plans/{planId}/places/{placeId}", 1L, 1L)
                         .with(user(MEMBER_EMAIL))
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
@@ -106,7 +105,7 @@ class PlaceControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("수정 성공"));
 
-        verify(placeService).updatePlace(MEMBER_ID, 1L, dto);
+        verify(placeService).updatePlace(MEMBER_ID, 1L, 1L, dto);
     }
 
     @Test

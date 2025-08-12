@@ -98,12 +98,11 @@ class PlaceServiceTest {
         when(placeRepository.findByPlanAndPlaceId(plan, PLACE_ID)).thenReturn(Optional.of(place));
 
         PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto();
-        dto.setPlaceId(PLACE_ID);
         dto.setDescription("새 설명");
 
-        placeService.updatePlace(MEMBER_ID, PLAN_ID, dto);
+        placeService.updatePlace(MEMBER_ID, PLAN_ID, PLACE_ID, dto);
 
-        verify(place).changeDescription("새 설명");
+        verify(place).changePlan(dto);
     }
 
     @Test
