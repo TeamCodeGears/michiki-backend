@@ -53,7 +53,7 @@ public class PlaceService {
 
         Place place = getPlace(plan, placeId);
 
-        place.changeDescription(dto);
+        place.changePlan(dto);
     }
 
     // 장소 삭제

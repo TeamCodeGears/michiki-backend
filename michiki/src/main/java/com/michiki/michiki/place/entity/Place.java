@@ -76,7 +76,8 @@ public class Place extends BaseEntity {
         this.orderInDay = orderInDay;
     }
 
-    public void changeDescription(PlaceUpdateRequestDto dto) {
+    public void changePlan(PlaceUpdateRequestDto dto) {
+        this.name = dto.getName();
         this.description = dto.getDescription();
     }
 }
