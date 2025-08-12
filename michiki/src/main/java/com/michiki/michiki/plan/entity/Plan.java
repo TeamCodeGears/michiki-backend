@@ -41,14 +41,6 @@ public class Plan extends BaseEntity {
     @Column(name = "END_DATE")
     private LocalDate endDate;
 
-    // 계획 생성 일시
-    @Column(name = "CREATED_AT")
-    private LocalDateTime createdAt;
-
-    // 계획 수정 일시
-    @Column(name = "UPDATED_AT")
-    private LocalDateTime updatedAt;
-
     // 공유 URI (토큰 기반)
     @Column(name = "SHARE_URI", length = 255, nullable = false)
     private String shareURI;

@@ -38,6 +38,17 @@ public class PlanController {
         return ResponseEntity.ok(plans);
     }
 
+    // 여행 계획 생성
+    @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Map<String, String>> createPlan(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody PlanRequestDto planRequestDto){
+
+        planService.createPlan(getMemberId(userDetails), planRequestDto);
+        return ResponseEntity.ok(Map.of("message", "계획 등록 성공"));
+    }
+
     // 여행 계획 나가기
     @PostMapping("/{planId}")
     public ResponseEntity<Map<String, String>> leavePlan(
