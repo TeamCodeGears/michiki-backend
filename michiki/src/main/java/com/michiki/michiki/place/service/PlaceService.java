@@ -38,6 +38,7 @@ public class PlaceService {
         memberValidate(memberId, plan);
 
         Place place = createPlace(placeRequestDto, plan, member);
+        plan.getPlaces().add(place);
 
         placeRepository.save(place);
     }
@@ -64,6 +65,7 @@ public class PlaceService {
         memberValidate(member.getMemberId(), plan);
 
         Place place = getPlace(plan, placeId);
+        plan.getPlaces().remove(place);
 
         placeRepository.delete(place);
     }
