@@ -44,16 +44,16 @@ public class PlaceService {
     }
 
     // 장소 설명 수정
-    @Transactional(readOnly = true)
-    public void updatePlace(Long memberId, Long planId, PlaceUpdateRequestDto dto) {
+    @Transactional
+    public void updatePlace(Long memberId, Long planId, Long placeId, PlaceUpdateRequestDto dto) {
         Plan plan = getPlan(planId);
         Member member = getMember(memberId);
 
         memberValidate(member.getMemberId(), plan);
 
-        Place place = getPlace(plan, dto.getPlaceId());
+        Place place = getPlace(plan, placeId);
 
-        place.changeDescription(dto.getDescription());
+        place.changePlace(dto);
     }
 
     // 장소 삭제

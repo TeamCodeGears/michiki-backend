@@ -2,6 +2,7 @@ package com.michiki.michiki.place.entity;
 
 import com.michiki.michiki.common.BaseEntity;
 import com.michiki.michiki.member.entity.Member;
+import com.michiki.michiki.place.dto.PlaceUpdateRequestDto;
 import com.michiki.michiki.plan.entity.Plan;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -70,13 +71,16 @@ public class Place extends BaseEntity {
     @Column(name = "ORDER_IN_DAY", nullable = false)
     private Integer orderInDay;
 
-    // 설명 수정 메서드
-    public void changeDescription(String description) {
-        this.description = description;
-    }
-
     // 일별 순서 변경 메서드
     public void changeOrderInDay(@NotNull Integer orderInDay) {
         this.orderInDay = orderInDay;
+    }
+
+    public void changePlace(PlaceUpdateRequestDto dto) {
+        this.name = dto.getName();
+        this.description = dto.getDescription();
+        this.latitude = dto.getLatitude();
+        this.longitude = dto.getLongitude();
+        this.googlePlaceId = dto.getGooglePlacedId();
     }
 }
