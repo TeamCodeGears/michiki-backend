@@ -76,11 +76,7 @@ public class Place extends BaseEntity {
         this.orderInDay = orderInDay;
     }
 
-    public void changePlace(PlaceUpdateRequestDto dto) {
-        this.name = dto.getName();
+    public void changeDescription(PlaceUpdateRequestDto dto) {
         this.description = dto.getDescription();
-        this.latitude = dto.getLatitude();
-        this.longitude = dto.getLongitude();
-        this.googlePlaceId = dto.getGooglePlacedId();
     }
 }
