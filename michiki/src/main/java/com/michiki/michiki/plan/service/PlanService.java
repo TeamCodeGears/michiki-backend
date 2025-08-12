@@ -9,6 +9,7 @@ import com.michiki.michiki.pivot.entity.MemberPlan;
 import com.michiki.michiki.pivot.entity.repository.MemberPlanRepository;
 import com.michiki.michiki.plan.dto.MemberOnlineStatusDto;
 import com.michiki.michiki.plan.dto.PlanDetailResponseDto;
+import com.michiki.michiki.plan.dto.PlanRequestDto;
 import com.michiki.michiki.plan.dto.PlanResponseDto;
 import com.michiki.michiki.plan.entity.Plan;
 import com.michiki.michiki.plan.repository.PlanRepository;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +32,25 @@ public class PlanService {
     private final MemberRepository memberRepository;
     private final PlanRepository planRepository;
     private final PlaceRepository placeRepository;
+
+    // 플랜 생성
+    @Transactional
+    public void createPlan(Long memberId, PlanRequestDto planRequestDto) {
+
+        Member member = getMember(memberId);
+
+        Plan plan = Plan.builder()
+                .title(planRequestDto.getTitle())
+                .startDate(planRequestDto.getStartDate())
+                .endDate(planRequestDto.getEndDate())
+                .shareURI(null)
+                .shareUriExpiresAt(null)
+                .build();
+
+        plan.getMemberPlans().add(new MemberPlan(member, plan,null));
+
+        planRepository.save(plan);
+    }
 
     // 특정 연도에 시작된 사용자의 모든 여행 계획 조회
     @Transactional(readOnly = true)
@@ -115,8 +134,6 @@ public class PlanService {
                 .title(plan.getTitle())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
-                .createdAt(plan.getCreatedAt())
-                .updatedAt(plan.getUpdatedAt())
                 .places(placeDtos)
                 .shareUri(plan.getShareURI()) // 필요시 포함
                 .build();
