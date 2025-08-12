@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -30,7 +31,7 @@ public class Plan extends BaseEntity {
     private Long planId;
 
     // 계획 제목
-    @Column(name = "TITLE", length = 255, nullable = false)
+    @Column(name = "TITLE", nullable = false)
     private String title;
 
     // 여행 시작일
@@ -42,7 +43,7 @@ public class Plan extends BaseEntity {
     private LocalDate endDate;
 
     // 공유 URI (토큰 기반)
-    @Column(name = "SHARE_URI", length = 255, nullable = false)
+    @Column(name = "SHARE_URI")
     private String shareURI;
 
     // 공유 URI 만료 시간
@@ -50,12 +51,14 @@ public class Plan extends BaseEntity {
     private LocalDateTime shareUriExpiresAt;
 
     // 계획에 포함된 장소 목록
+    @Builder.Default
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Place> places;
+    private List<Place> places = new ArrayList<>();
 
     // 참여중인 유저 정보
+    @Builder.Default
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberPlan> memberPlans;
+    private List<MemberPlan> memberPlans = new ArrayList<>();
 
     // 공유 URI 만료일 반환
     public LocalDateTime getShareUriExpiresAt() {

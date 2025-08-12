@@ -33,6 +33,8 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final PlaceRepository placeRepository;
 
+    private static final Random random = new Random();
+
     // 플랜 생성
     @Transactional
     public void createPlan(Long memberId, PlanRequestDto planRequestDto) {
@@ -47,7 +49,9 @@ public class PlanService {
                 .shareUriExpiresAt(null)
                 .build();
 
-        plan.getMemberPlans().add(new MemberPlan(member, plan,null));
+        String color = getRandomHexColor();
+
+        plan.getMemberPlans().add(new MemberPlan(member, plan,color));
 
         planRepository.save(plan);
     }
@@ -88,6 +92,7 @@ public class PlanService {
         memberPlan.changeColor(newColor);
     }
 
+    @Transactional(readOnly = true)
     // 계획에 참여중인 사용자의 온라인 상태 목록 반환
     public List<MemberOnlineStatusDto> getOnlineMembers(Long planId, String username) {
         Plan plan = getPlan(planId);
@@ -156,5 +161,12 @@ public class PlanService {
     private Plan getPlan(Long planId) {
         return planRepository.findById(planId)
                 .orElseThrow(() -> new PlanNotFoundException("해당 계획을 찾을 수 없습니다."));
+    }
+
+    private String getRandomHexColor() {
+        int r = random.nextInt(256);
+        int g = random.nextInt(256);
+        int x = random.nextInt(256);
+        return String.format("#%02x%02x%02x", r, g, x);
     }
 }

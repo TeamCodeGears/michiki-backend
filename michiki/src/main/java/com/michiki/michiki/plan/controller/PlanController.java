@@ -40,7 +40,6 @@ public class PlanController {
 
     // 여행 계획 생성
     @PostMapping
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Map<String, String>> createPlan(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody PlanRequestDto planRequestDto){

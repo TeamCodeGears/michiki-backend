@@ -70,13 +70,14 @@ public class PlaceController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 계획 또는 장소")
     })
-    @PutMapping("/{planId}/places")
+    @PutMapping("/{planId}/places/{placeId}")
     public ResponseEntity<Map<String, String>> updatePlace(
             @PathVariable Long planId,
+            @PathVariable Long placeId,
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody PlaceUpdateRequestDto placeUpdateRequestDto
     ) {
-        placeService.updatePlace(getMemberId(userDetails), planId, placeUpdateRequestDto);
+        placeService.updatePlace(getMemberId(userDetails), planId, placeId, placeUpdateRequestDto);
         return ResponseEntity.ok(Map.of("message", "수정 성공"));
     }
 
