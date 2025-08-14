@@ -82,9 +82,8 @@ public class PlanController {
     @GetMapping("/{planId}")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<PlanDetailResponseDto> getPlanDetail(
-            @PathVariable Long planId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        PlanDetailResponseDto response = planService.getPlanDetail(planId, userDetails.getUsername());
+            @PathVariable Long planId) {
+        PlanDetailResponseDto response = planService.getPlanDetail(planId);
         return ResponseEntity.ok(response);
     }
 

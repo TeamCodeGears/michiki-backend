@@ -116,13 +116,14 @@ public class PlanService {
 
     // 여행 계획 상세 정보 조회
     @Transactional(readOnly = true)
-    public PlanDetailResponseDto getPlanDetail(Long planId, String username) {
+    public PlanDetailResponseDto getPlanDetail(Long planId) {
 
         Plan plan = getPlan(planId);
         List<Place> places = placeRepository.findByPlanOrderByTravelDateAsc(plan);
         List<PlaceResponseDto> placeDtos = places.stream()
                 .map(place -> PlaceResponseDto.builder()
                         .memberId(place.getMember().getMemberId())
+                        .placeId(place.getPlaceId())
                         .name(place.getName())
                         .description(place.getDescription())
                         .latitude(place.getLatitude())
