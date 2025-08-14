@@ -126,7 +126,9 @@ public class MemberController {
     // 회원 탈퇴 처리
     @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자의 회원 탈퇴를 진행합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = Map.class))),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "회원 정보가 존재하지 않음")
     })
