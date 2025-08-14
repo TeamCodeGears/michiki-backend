@@ -18,8 +18,5 @@ public class PlanDetailResponseDto {
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String shareUri;
     private List<PlaceResponseDto> places;
 }

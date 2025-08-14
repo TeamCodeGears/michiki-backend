@@ -114,13 +114,12 @@ public class PlanService {
         return false;
     }
 
-    // 여행 계획 상세 정보 조회 (장소 포함)
+    // 여행 계획 상세 정보 조회
     @Transactional(readOnly = true)
     public PlanDetailResponseDto getPlanDetail(Long planId, String username) {
-        Member member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
+
         Plan plan = getPlan(planId);
-        List<Place> places = placeRepository.findByPlanOrderByTravelDateAscOrderInDayAsc(plan);
+        List<Place> places = placeRepository.findByPlanOrderByTravelDateAsc(plan);
         List<PlaceResponseDto> placeDtos = places.stream()
                 .map(place -> PlaceResponseDto.builder()
                         .memberId(place.getMember().getMemberId())
@@ -140,9 +139,9 @@ public class PlanService {
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .places(placeDtos)
-                .shareUri(plan.getShareURI()) // 필요시 포함
                 .build();
     }
+
     // 사용자 참여 여부 검증
     private void validateParticipant(Plan plan, String username) {
         boolean isParticipant = plan.getMemberPlans().stream()

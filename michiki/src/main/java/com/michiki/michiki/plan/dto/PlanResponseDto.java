@@ -3,7 +3,6 @@ package com.michiki.michiki.plan.dto;
 import com.michiki.michiki.plan.entity.Plan;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -15,13 +14,8 @@ import java.time.LocalDate;
 public class PlanResponseDto {
    private Long planId;
    private String title;
-   private BigDecimal latitude;
-   private BigDecimal longitude;
-   private String googlePlacedId;
    private LocalDate startDate;
    private LocalDate endDate;
-   private LocalDate travelDate;
-   private int orderInDay;
 
    // plan Entity -> Dto 변환 메서드
    public static PlanResponseDto fromEntity(Plan plan) {
