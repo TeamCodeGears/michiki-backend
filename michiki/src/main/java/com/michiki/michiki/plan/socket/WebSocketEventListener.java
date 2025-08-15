@@ -1,6 +1,6 @@
 package com.michiki.michiki.plan.socket;
 
-import com.michiki.michiki.member.service.MemberService;
+import com.michiki.michiki.common.auth.dto.StompMemberPrincipal;
 import com.michiki.michiki.plan.dto.OnlineMemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -36,11 +36,8 @@ public class WebSocketEventListener {
             String sessionId = sha.getSessionId(); // 세션 ID를 가져옵니다.
 
             if (principal != null && sessionId != null) {
-                OnlineMemberDto user = getMemberInfoFromPrincipal(principal);
+                OnlineMemberDto user = getMemberInfoFromPrincipal(principal,planId);
 
-                // OnlineMemberDto 객체에 planId를 설정합니다.
-                // (OnlineMemberDto 클래스에 planId 필드와 Setter가 있다고 가정)
-                user.setPlanId(planId);
 
                 // 세션 ID를 키로 사용자 정보를 맵에 저장합니다.
                 sessionInfoMap.put(sessionId, user);
@@ -78,9 +75,18 @@ public class WebSocketEventListener {
         return Long.parseLong(split[3]);
     }
 
-    private OnlineMemberDto getMemberInfoFromPrincipal(Principal principal) {
+    private OnlineMemberDto getMemberInfoFromPrincipal(Principal principal, Long planId) {
         // principal 또는 SecurityContext에서 사용자 정보 조회 후 UserInfo 생성
         // 예) memberId, nickname, profileImage 조회
-        return new OnlineMemberDto();
+        if (principal instanceof StompMemberPrincipal user) {
+            return new OnlineMemberDto(
+                    user.getMemberId(),
+                    planId,
+                    user.getNickname(),
+                    user.getProfileImage()
+            );
+        }
+        throw new IllegalStateException("인증된 사용자 정보가 없습니다!");
+
     }
 }
