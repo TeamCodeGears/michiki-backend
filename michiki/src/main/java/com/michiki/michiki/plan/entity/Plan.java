@@ -46,10 +46,6 @@ public class Plan extends BaseEntity {
     @Column(name = "SHARE_URI")
     private String shareURI;
 
-    // 공유 URI 만료 시간
-    @Column(name = "SHARE_URI_EXPIRES_AT")
-    private LocalDateTime shareUriExpiresAt;
-
     // 계획에 포함된 장소 목록
     @Builder.Default
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -60,20 +56,4 @@ public class Plan extends BaseEntity {
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberPlan> memberPlans = new ArrayList<>();
 
-    // 공유 URI 만료일 반환
-    public LocalDateTime getShareUriExpiresAt() {
-        return this.shareUriExpiresAt;
-    }
-
-    // 공유 URI 삭제(공유 취소시 사용)
-    public void clearShareURI() {
-        this.shareURI = null;
-        this.shareUriExpiresAt = null;
-    }
-
-    // 공유 URI 및 만료일 갱신
-    public void updateShareURI(String token, LocalDateTime expiresAt) {
-        this.shareURI = token;
-        this.shareUriExpiresAt = expiresAt;
-    }
 }

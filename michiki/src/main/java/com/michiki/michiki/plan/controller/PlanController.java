@@ -3,7 +3,6 @@ package com.michiki.michiki.plan.controller;
 import com.michiki.michiki.member.service.MemberService;
 import com.michiki.michiki.plan.dto.*;
 import com.michiki.michiki.plan.service.PlanService;
-import com.michiki.michiki.plan.service.ShareLinkService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ public class PlanController {
 
     private final PlanService planService;
     private final MemberService memberService;
-    private final ShareLinkService shareLinkService;
     // 연도별 여행 계획 목록 조회
     @GetMapping
     public ResponseEntity<List<PlanResponseDto>> getPlansByStartYear(
@@ -97,14 +95,5 @@ public class PlanController {
         List<MemberOnlineStatusDto> onlineMembers = planService.getOnlineMembers(planId, username);
         return ResponseEntity.ok(onlineMembers);
     }
-    // 공유 URI 발급
-    @PostMapping("/{planId}/share")
-    @SecurityRequirement(name = "bearerAuth")
-            public ResponseEntity<Map<String, String>> sharePlan(
-                    @PathVariable Long planId,
-                    @AuthenticationPrincipal UserDetails userDetails){
-        String username = userDetails.getUsername();
-        String uri = shareLinkService.createOrReuseShareUri(planId, username);
-        return ResponseEntity.ok(Map.of("shareURI", uri));
-    }
+
 }
