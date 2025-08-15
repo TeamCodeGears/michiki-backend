@@ -45,8 +45,7 @@ public class PlanService {
                 .title(planRequestDto.getTitle())
                 .startDate(planRequestDto.getStartDate())
                 .endDate(planRequestDto.getEndDate())
-                .shareURI(null)
-                .shareUriExpiresAt(null)
+                .shareURI(UUID.randomUUID().toString().replace("-", ""))
                 .build();
 
         String color = getRandomHexColor();
@@ -141,15 +140,6 @@ public class PlanService {
                 .endDate(plan.getEndDate())
                 .places(placeDtos)
                 .build();
-    }
-
-    // 사용자 참여 여부 검증
-    private void validateParticipant(Plan plan, String username) {
-        boolean isParticipant = plan.getMemberPlans().stream()
-                .anyMatch(mp -> mp.getMember().getEmail().equals(username));
-        if (!isParticipant) {
-            throw new RuntimeException("접근 권한이 없습니다.");
-        }
     }
 
     // 사용자 조회
