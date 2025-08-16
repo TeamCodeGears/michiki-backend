@@ -22,8 +22,9 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
             @Param("jan1") LocalDate jan1,
             @Param("dec31") LocalDate dec31
     );
+    // 공유 uri로 특정 계획을 찾음
+    Optional<Plan> findByShareURI(String shareURI);
 
-    // 공유 URI로 기반으로 계획 조회
-   Optional<Plan> findByShareURI(String shareURI);
+
 }
 
