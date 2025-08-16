@@ -203,7 +203,7 @@ public class PlanService {
         Plan plan = planRepository.findByShareURI(shareURI)
                 .orElseThrow(() -> new PlanNotFoundException("계획이 존재하지 않습니다."));
 
-        // 로그인하고 회원가입 안했을 시 -> 관람모드
+        // 로그인 된 사용자 조회 -> 예외 발생 안시키고 다시 관전 모드로 돌림
         Optional<Member> optionalMember = memberRepository.findByEmail(username);
         if (optionalMember.isEmpty()) {
             return getPlanByShareURI(shareURI);
