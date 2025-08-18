@@ -17,8 +17,13 @@ import com.michiki.michiki.place.dto.PlaceResponseDto;
 import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -159,4 +164,66 @@ public class PlanService {
         int x = random.nextInt(256);
         return String.format("#%02x%02x%02x", r, g, x);
     }
+
+
+    // uri 로그인 안 된 유저 읽기 전용
+    @Transactional(readOnly = true)
+    public PlanDetailResponseDto getPlanByShareURI(String shareURI) {
+        Plan plan = planRepository.findByShareURI(shareURI)
+                .orElseThrow(() -> new PlanNotFoundException("계획이 존재하지 않습니다."));
+
+        List<Place> places = placeRepository.findByPlanOrderByTravelDateAsc(plan);
+        List<PlaceResponseDto> placeDtos = places.stream()
+                .map(place -> PlaceResponseDto.builder()
+                        .memberId(place.getMember().getMemberId())
+                        .placeId(place.getPlaceId())
+                        .name(place.getName())
+                        .description(place.getDescription())
+                        .latitude(place.getLatitude())
+                        .longitude(place.getLongitude())
+                        .googlePlaceId(place.getGooglePlaceId())
+                        .travelDate(place.getTravelDate())
+                        .orderInDay(place.getOrderInDay())
+                        .build())
+                .toList();
+
+        return PlanDetailResponseDto.builder()
+                .planId(plan.getPlanId())
+                .title(plan.getTitle())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
+                .places(placeDtos)
+                .build();
+    }
+
+
+    // uri 로그인 참여자 추가
+    @Transactional
+    public PlanDetailResponseDto joinPlanByShareURI(String shareURI, String username) {
+        Plan plan = planRepository.findByShareURI(shareURI)
+                .orElseThrow(() -> new PlanNotFoundException("계획이 존재하지 않습니다."));
+
+        // 로그인 된 사용자 조회 -> 예외 발생 안시키고 다시 관전 모드로 돌림
+        Optional<Member> optionalMember = memberRepository.findByEmail(username);
+        if (optionalMember.isEmpty()) {
+            return getPlanByShareURI(shareURI);
+        }
+
+        Member member = optionalMember.get();
+
+        // 이미 참여자 -> 아무것도 안함
+        boolean alreadyJoined = plan.getMemberPlans().stream()
+                .anyMatch(mp -> mp.getMember().equals(member));
+
+        // 처음 참여한 유저 -> 멤버, 플랜, 컬러 받음
+        if (!alreadyJoined) {
+            String color = getRandomHexColor();
+            plan.getMemberPlans().add(new MemberPlan(member, plan, color));
+            planRepository.save(plan);
+        }
+        // 아니면 다시 관람 모드로 돌림
+        return getPlanByShareURI(shareURI);
+    }
+
+
 }
