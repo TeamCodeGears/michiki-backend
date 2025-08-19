@@ -93,6 +93,50 @@ class PlaceControllerTest {
     }
 
     @Test
+    void getPlaces_Success() throws Exception {
+        List<PlaceResponseDto> responseList = List.of(
+                PlaceResponseDto.builder()
+                        .placeId(1L)
+                        .name("장소 A")
+                        .description("설명 A")
+                        .latitude(new BigDecimal("37.5"))
+                        .longitude(new BigDecimal("127.0"))
+                        .travelDate(LocalDate.of(2025, 7, 30))
+                        .orderInDay(1)
+                        .googlePlaceId("G123")
+                        .memberId(MEMBER_ID)
+                        .build(),
+                PlaceResponseDto.builder()
+                        .placeId(2L)
+                        .name("장소 B")
+                        .description("설명 B")
+                        .latitude(new BigDecimal("37.6"))
+                        .longitude(new BigDecimal("127.1"))
+                        .travelDate(LocalDate.of(2025, 7, 30))
+                        .orderInDay(2)
+                        .googlePlaceId("G124")
+                        .memberId(MEMBER_ID)
+                        .build()
+        );
+
+        when(placeService.getPlacesByPlanId(1L)).thenReturn(responseList);
+
+        mockMvc.perform(get("/plans/{planId}/places", 1L)
+                        .with(user(MEMBER_EMAIL))
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].placeId").value(1L))
+                .andExpect(jsonPath("$[0].name").value("장소 A"))
+                .andExpect(jsonPath("$[0].description").value("설명 A"))
+                .andExpect(jsonPath("$[1].placeId").value(2L))
+                .andExpect(jsonPath("$[1].name").value("장소 B"))
+                .andExpect(jsonPath("$[1].description").value("설명 B"));
+
+        verify(placeService).getPlacesByPlanId(1L);
+    }
+
+    @Test
     void updatePlace_Success() throws Exception {
         PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto();
         dto.setDescription("수정된 설명");

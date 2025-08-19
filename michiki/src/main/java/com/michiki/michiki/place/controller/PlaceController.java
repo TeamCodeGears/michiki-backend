@@ -55,6 +55,28 @@ public class PlaceController {
         return ResponseEntity.ok(Map.of("message", "장소 등록 성공"));
     }
 
+    @Operation(
+            summary = "장소 목록 조회",
+            description = "특정 계획(planId)에 등록된 모든 장소를 조회합니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "장소 목록 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PlaceResponseDto.class, type = "array"))
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 계획")
+    })
+    @GetMapping("/{planId}/places")
+    public ResponseEntity<List<PlaceResponseDto>> getPlaces(@PathVariable Long planId) {
+        List<PlaceResponseDto> places = placeService.getPlacesByPlanId(planId);
+        return ResponseEntity.ok(places);
+    }
+
     // 장소 설명 수정 API
     @Operation(
             summary = "장소 수정",

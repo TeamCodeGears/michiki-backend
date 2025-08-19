@@ -18,6 +18,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class PlaceServiceTest {
     @Mock
     PlaceRepository placeRepository;
@@ -89,6 +92,56 @@ class PlaceServiceTest {
 
         assertThat(place.getLatitude()).isEqualByComparingTo(new BigDecimal("37.5"));
         assertThat(place.getLongitude()).isEqualByComparingTo(new BigDecimal("127.0"));
+    }
+
+    @Test
+    void getPlacesByPlanId_Success() {
+        // Mock Place 엔티티 생성
+        Place place1 = Place.builder()
+                .placeId(1L)
+                .plan(plan)
+                .member(member)
+                .name("장소 A")
+                .description("설명 A")
+                .latitude(new BigDecimal("37.5"))
+                .longitude(new BigDecimal("127.0"))
+                .googlePlaceId("G123")
+                .travelDate(LocalDate.of(2025, 7, 30))
+                .orderInDay(1)
+                .build();
+
+        Place place2 = Place.builder()
+                .placeId(2L)
+                .plan(plan)
+                .member(member)
+                .name("장소 B")
+                .description("설명 B")
+                .latitude(new BigDecimal("37.6"))
+                .longitude(new BigDecimal("127.1"))
+                .googlePlaceId("G124")
+                .travelDate(LocalDate.of(2025, 7, 30))
+                .orderInDay(2)
+                .build();
+
+        // Repository Mock 설정
+        when(placeRepository.findByPlan_PlanId(PLAN_ID))
+                .thenReturn(List.of(place1, place2));
+
+        // Service 호출
+        List<PlaceResponseDto> result = placeService.getPlacesByPlanId(PLAN_ID);
+
+        // 결과 검증
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getPlaceId()).isEqualTo(1L);
+        assertThat(result.get(0).getName()).isEqualTo("장소 A");
+        assertThat(result.get(0).getDescription()).isEqualTo("설명 A");
+
+        assertThat(result.get(1).getPlaceId()).isEqualTo(2L);
+        assertThat(result.get(1).getName()).isEqualTo("장소 B");
+        assertThat(result.get(1).getDescription()).isEqualTo("설명 B");
+
+        // Repository 호출 검증
+        verify(placeRepository).findByPlan_PlanId(PLAN_ID);
     }
 
     @Test

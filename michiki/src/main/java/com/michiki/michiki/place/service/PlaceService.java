@@ -43,7 +43,15 @@ public class PlaceService {
         placeRepository.save(place);
     }
 
+    @Transactional(readOnly = true)
+    public List<PlaceResponseDto> getPlacesByPlanId(Long planId) {
+        return placeRepository.findByPlan_PlanId(planId)
+                .stream()
+                .map(PlaceResponseDto::fromEntity)
+                .toList();
+    }
     // 장소 설명 수정
+
     @Transactional
     public void updatePlace(Long memberId, Long planId, Long placeId, PlaceUpdateRequestDto dto) {
         Plan plan = getPlan(planId);
@@ -55,8 +63,8 @@ public class PlaceService {
 
         place.changePlan(dto);
     }
-
     // 장소 삭제
+
     @Transactional
     public void deletePlace(Long memberId, Long planId, Long placeId) {
         Member member = getMember(memberId);
@@ -69,8 +77,8 @@ public class PlaceService {
 
         placeRepository.delete(place);
     }
-
     // 장소 순서 정렬
+
     @Transactional
     public List<PlaceResponseDto> reorderPlaces(Long memberId, Long planId, PlaceReorderRequestDto dto) {
         Plan plan = getPlan(planId);
@@ -95,8 +103,8 @@ public class PlaceService {
                 .map(PlaceResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
-
     // 추천 장소 목록 조회
+
     @Transactional(readOnly = true)
     public List<PlaceResponseDto> recommendPlaces(Long memberId, Long planId, PlaceRecommendationRequestDto dto) {
         Plan plan = getPlan(planId);
@@ -110,9 +118,9 @@ public class PlaceService {
                 .map(PlaceResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
-
     // TODO: 실제 로직은 DB 쿼리나 외부 API 호출로 대체해야 한다.- 이거 수정 필요하다 특히 구글줌
     // 예시용으로 중심 좌표에서 일정 거리 이내인 더미 필터링을 해보는 형태로 만들면 이렇게 확장 가능하다.
+
     private List<Place> fetchCandidatePlaces(Double centerLat, Double centerLng, Float zoomLevel) {
         // placeholder: 실제라면 zoomLevel을 기반으로 반경을 계산해서 DB에서 조건에 맞는 장소를 조회.
         // 예: zoomLevel이 클수록 더 좁은 반경 -> radius 계산 (여기서는 단순화)
@@ -128,15 +136,15 @@ public class PlaceService {
                 })
                 .toList();
     }
-
     // zoomLevel을 반경(km)으로 변환하는 간단한 예시
+
     private double zoomLevelToRadiusKm(Float zoomLevel) {
         // 이 함수는 비례적으로 조정할 수 있고, 실제 요구에 맞게 튜닝 필요
         // 예: zoomLevel 1 -> 100km, 10 -> 10km, 15 -> 2km 식으로
         return Math.max(1.0, 100.0 / zoomLevel);
     }
-
     // Haversine formula: 두 좌표 사이 거리 (km)
+
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371; // 지구 반지름 km
         double dLat = Math.toRadians(lat2 - lat1);
@@ -147,8 +155,8 @@ public class PlaceService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
-
     // 해당 유저가 해당 계획에 참여중인지 검증
+
     private static void memberValidate(Long memberId, Plan plan) {
         boolean participates = plan.getMemberPlans().stream()
                 .anyMatch(mp -> mp.getMember().getMemberId().equals(memberId));
@@ -156,8 +164,8 @@ public class PlaceService {
             throw new NotParticipatingMemberException("해당 계획에 참여중이 아닙니다.");
         }
     }
-
     // place Entity 생성 헬퍼 메서드
+
     private static Place createPlace(PlaceRequestDto placeRequestDto, Plan plan, Member member) {
         return Place.builder()
                 .plan(plan)
@@ -171,23 +179,22 @@ public class PlaceService {
                 .orderInDay(placeRequestDto.getOrderInDay())
                 .build();
     }
-
     // 유저 조회
+
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
     }
-
     // 계획 조회
+
     private Plan getPlan(Long planId) {
         return planRepository.findById(planId)
                 .orElseThrow(() -> new PlanNotFoundException("존재하지 않는 계획입니다."));
     }
-
     // 계획 기준 장소 조회
+
     private Place getPlace(Plan plan, Long placeId) {
         return placeRepository.findByPlanAndPlaceId(plan, placeId)
                 .orElseThrow(() -> new PlaceNotFoundException("해당 플랜에 장소가 없습니다."));
     }
-
 }

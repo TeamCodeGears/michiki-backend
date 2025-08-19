@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     // 특정 계획 포함된 모든 장소 목록 조회
     List<Place> findByPlan(Plan plan);
-}
+
+    List<Place> findByPlan_PlanId(Long planId);
+    }
