@@ -7,25 +7,21 @@ import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.member.repository.MemberRepository;
 import com.michiki.michiki.pivot.entity.MemberPlan;
 import com.michiki.michiki.pivot.entity.repository.MemberPlanRepository;
-import com.michiki.michiki.plan.dto.PlanDetailResponseDto;
-import com.michiki.michiki.plan.dto.PlanRequestDto;
-import com.michiki.michiki.plan.dto.PlanResponseDto;
-import com.michiki.michiki.plan.entity.Plan;
-import com.michiki.michiki.plan.repository.PlanRepository;
 import com.michiki.michiki.place.dto.PlaceResponseDto;
 import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
+import com.michiki.michiki.plan.dto.*;
+import com.michiki.michiki.plan.entity.Plan;
+import com.michiki.michiki.plan.repository.PlanRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -36,7 +32,6 @@ public class PlanService {
     private final MemberRepository memberRepository;
     private final PlanRepository planRepository;
     private final PlaceRepository placeRepository;
-    private final NotificationService notificationService;
 
     private static final Random random = new Random();
 
@@ -74,34 +69,16 @@ public class PlanService {
     @Transactional
     public String leavePlan(Long memberId, Long planId) {
         Plan plan = getPlan(planId);
-        Member member = getMember(memberId);
         MemberPlan targetPlan = plan.getMemberPlans().stream()
                 .filter(mp -> mp.getMember().getMemberId().equals(memberId))
                 .findFirst()
                 .orElseThrow(() -> new NotParticipatingMemberException("해당 계획에 참여중이 아닙니다."));
         plan.getMemberPlans().remove(targetPlan);
-
-        // 알림 대상자-> 남아있는 사람
-        List<Long> otherMemberIds = plan.getMemberPlans().stream()
-                .map(mp -> mp.getMember().getMemberId())
-                .collect(Collectors.toList());
-
-        //멤버 1명도 없으면 -> 삭제
         if (plan.getMemberPlans().isEmpty()) {
-            notificationService.notifyDeleted(plan.getPlanId(), plan.getTitle(), List.of(memberId));
             planRepository.delete(plan);
             return "삭제";
-        } else {
-            // 아직 방에 남은 멤버에게 알림 전송
-            notificationService.notifyLeft(
-                    plan.getPlanId(),
-                    plan.getTitle(),
-                    member.getMemberId(),
-                    member.getNickname(),
-                    otherMemberIds
-            );
-            return "나가기";
         }
+        return "나가기";
     }
 
     // 계획 내 사용자 색상 변경
@@ -114,6 +91,27 @@ public class PlanService {
         memberPlan.changeColor(newColor);
     }
 
+    @Transactional(readOnly = true)
+    // 계획에 참여중인 사용자의 온라인 상태 목록 반환
+    public List<MemberOnlineStatusDto> getOnlineMembers(Long planId, String username) {
+        Plan plan = getPlan(planId);
+        List<Member> members = plan.getMemberPlans().stream()
+                .map(MemberPlan::getMember)
+                .toList();
+        return members.stream()
+                .map(member -> new MemberOnlineStatusDto(
+                        member.getMemberId(),
+                        member.getNickname(),
+                        member.getProfileImage(),
+                        checkOnlineStatus(member.getMemberId())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // ToDo: 온라인 여부 확인 (추후 구현 예정)
+    private boolean checkOnlineStatus(Long memberId) {
+        return false;
+    }
 
     // 여행 계획 상세 정보 조회
     @Transactional(readOnly = true)
@@ -135,12 +133,22 @@ public class PlanService {
                         .build())
                 .toList();
 
+        List<PlanMemberDto> memberDtos = plan.getMemberPlans().stream()
+                .map(mp -> PlanMemberDto.builder()
+                        .memberId(mp.getMember().getMemberId())
+                        .nickname(mp.getMember().getNickname())
+                        .profileImage(mp.getMember().getProfileImage())
+                        .color(mp.getColor())
+                        .build())
+                .toList();
+
         return PlanDetailResponseDto.builder()
                 .planId(plan.getPlanId())
                 .title(plan.getTitle())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .places(placeDtos)
+                .members(memberDtos)
                 .build();
     }
 
@@ -217,22 +225,6 @@ public class PlanService {
             String color = getRandomHexColor();
             plan.getMemberPlans().add(new MemberPlan(member, plan, color));
             planRepository.save(plan);
-
-            // 다른 참여자 ID만 추출
-            List<Long> otherMemberIds = plan.getMemberPlans().stream()
-                    .map(mp -> mp.getMember().getMemberId())
-                    .filter(id -> !id.equals(member.getMemberId()))
-                    .collect(Collectors.toList());
-
-            // 알림 보내기 (사람 들어왔다)
-            notificationService.notifyJoined(
-                    plan.getPlanId(),
-                    plan.getTitle(),
-                    member.getMemberId(),
-                    member.getNickname(),
-                    otherMemberIds
-            );
-
         }
         // 아니면 다시 관람 모드로 돌림
         return getPlanByShareURI(shareURI);
