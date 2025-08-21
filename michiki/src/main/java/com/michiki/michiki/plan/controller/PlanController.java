@@ -73,7 +73,7 @@ public class PlanController {
         return ResponseEntity.ok(Map.of("message", "변경 성공"));
 
 
-    }
+}
     // 현재 로그인한 사용자의 memberId 조회
     private Long getMemberId(UserDetails userDetails) {
         String email = userDetails.getUsername();
