@@ -7,26 +7,21 @@ import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.member.repository.MemberRepository;
 import com.michiki.michiki.pivot.entity.MemberPlan;
 import com.michiki.michiki.pivot.entity.repository.MemberPlanRepository;
-import com.michiki.michiki.plan.dto.MemberOnlineStatusDto;
-import com.michiki.michiki.plan.dto.PlanDetailResponseDto;
-import com.michiki.michiki.plan.dto.PlanRequestDto;
-import com.michiki.michiki.plan.dto.PlanResponseDto;
-import com.michiki.michiki.plan.entity.Plan;
-import com.michiki.michiki.plan.repository.PlanRepository;
 import com.michiki.michiki.place.dto.PlaceResponseDto;
 import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
+import com.michiki.michiki.plan.dto.*;
+import com.michiki.michiki.plan.entity.Plan;
+import com.michiki.michiki.plan.repository.PlanRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -138,12 +133,22 @@ public class PlanService {
                         .build())
                 .toList();
 
+        List<PlanMemberDto> memberDtos = plan.getMemberPlans().stream()
+                .map(mp -> PlanMemberDto.builder()
+                        .memberId(mp.getMember().getMemberId())
+                        .nickname(mp.getMember().getNickname())
+                        .profileImage(mp.getMember().getProfileImage())
+                        .color(mp.getColor())
+                        .build())
+                .toList();
+
         return PlanDetailResponseDto.builder()
                 .planId(plan.getPlanId())
                 .title(plan.getTitle())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .places(placeDtos)
+                .members(memberDtos)
                 .build();
     }
 
