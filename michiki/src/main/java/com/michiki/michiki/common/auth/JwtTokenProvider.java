@@ -27,8 +27,12 @@ public class JwtTokenProvider {
         this.SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode(secretKey), SignatureAlgorithm.HS512.getJcaName());
     }
 
-    public String createAccessToken(String email) {
+    public String createAccessToken(Long memberId, String email, String nickname, String profileImage) {
         Claims claims = Jwts.claims().setSubject(email);
+        claims.put("memberId", memberId);
+        claims.put("nickname", nickname);
+        claims.put("profileImage", profileImage);
+
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
@@ -38,8 +42,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(String email) {
+    public String createRefreshToken(Long memberId, String email, String nickname, String profileImage) {
         Claims claims = Jwts.claims().setSubject(email);
+        claims.put("memberId", memberId);
+        claims.put("nickname", nickname);
+        claims.put("profileImage", profileImage);
+
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
