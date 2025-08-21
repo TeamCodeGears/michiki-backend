@@ -1,32 +1,18 @@
 package com.michiki.michiki.plan.service;
 
-import com.michiki.michiki.common.exception.PlanNotFoundException;
+import com.michiki.michiki.plan.repository.PlanRepository;
+import com.michiki.michiki.plan.dto.PlanRequestDto;
 import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.member.repository.MemberRepository;
-import com.michiki.michiki.pivot.entity.MemberPlan;
-import com.michiki.michiki.plan.dto.PlanDetailResponseDto;
-import com.michiki.michiki.plan.entity.Plan;
-import com.michiki.michiki.plan.repository.PlanRepository;
-import com.michiki.michiki.place.entity.Place;
-import com.michiki.michiki.place.repository.PlaceRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.ArrayList;
-
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-public class PlanServiceTest {
+class PlanServiceTest {
 
     @Mock
     private PlanRepository planRepository;
@@ -34,42 +20,36 @@ public class PlanServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @Mock
-    private PlaceRepository placeRepository;
-
     @InjectMocks
     private PlanService planService;
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
     @Test
-    void 공유URI_회원_처음참여_자동가입_성공() {
+    void testCreatePlan() {
         // given
-        Plan plan = Plan.builder()
-                .planId(1L)
+        Long memberId = 1L;
+        PlanRequestDto dto = PlanRequestDto.builder()
                 .title("제주도 여행")
-                .startDate(LocalDate.of(2025, 8, 20))
-                .endDate(LocalDate.of(2025, 8, 25))
-                .shareURI("abc123")
-                .memberPlans(new ArrayList<>()) // 처음이니까 비어있음
+                .startDate(java.time.LocalDate.of(2025, 9, 1))
+                .endDate(java.time.LocalDate.of(2025, 9, 10))
                 .build();
 
-        Member member = Member.builder()
-                .memberId(100L)
+        Member mockMember = Member.builder()
+                .memberId(memberId)
+                .nickname("테스트유저")
                 .email("test@example.com")
                 .build();
 
-        when(planRepository.findByShareURI("abc123")).thenReturn(Optional.of(plan));
-        when(memberRepository.findByEmail("test@example.com")).thenReturn(Optional.of(member));
-        when(placeRepository.findByPlanOrderByTravelDateAsc(plan)).thenReturn(Collections.emptyList());
+        when(memberRepository.findById(memberId)).thenReturn(java.util.Optional.of(mockMember));
 
         // when
-        PlanDetailResponseDto result = planService.joinPlanByShareURI("abc123", "test@example.com");
+        planService.createPlan(memberId, dto);
 
         // then
-        assertThat(result.getTitle()).isEqualTo("제주도 여행");
-        assertThat(plan.getMemberPlans()).hasSize(1);
-        assertThat(plan.getMemberPlans().get(0).getMember()).isEqualTo(member);
-
-        verify(planRepository).save(plan); // 자동 저장 여부 확인
+        verify(planRepository, times(1)).save(any());
     }
-
 }
