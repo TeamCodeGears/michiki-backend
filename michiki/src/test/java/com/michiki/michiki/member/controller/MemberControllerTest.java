@@ -55,8 +55,13 @@ class MemberControllerTest {
         when(memberService.getMemberBySocialId(anyString())).thenReturn(null);
         when(memberService.createOauth(anyString(), anyString(), any(), any(), any())).thenReturn(
                 Member.builder().memberId(1L).email("email").build());
-        when(jwtTokenProvider.createAccessToken(anyString())).thenReturn("accessToken");
-        when(jwtTokenProvider.createRefreshToken(anyString())).thenReturn("refreshToken");
+        when(jwtTokenProvider.createAccessToken(
+                any(), anyString(), nullable(String.class), nullable(String.class)
+        )).thenReturn("accessToken");
+        when(jwtTokenProvider.createRefreshToken(
+                any(), anyString(), nullable(String.class), nullable(String.class)
+        )).thenReturn("refreshToken");
+
 
         ResponseEntity<?> response = memberController.googleLogin(redirectDto);
 
@@ -100,7 +105,7 @@ class MemberControllerTest {
         // 검증: HTTP 200, 메시지
         @SuppressWarnings("unchecked")
         Map<String, String> body = (Map<String, String>) response.getBody();
-        assertEquals("회원탈퇴 성공", body.get("message"));
+        assertEquals("회원 탈퇴 성공", body.get("message")); // <-- 띄어쓰기 맞춰줌
 
         // 서비스 호출 검증
         verify(memberService).withdrawByEmail("test@example.com");
