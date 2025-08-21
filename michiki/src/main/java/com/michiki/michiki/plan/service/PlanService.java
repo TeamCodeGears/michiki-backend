@@ -91,23 +91,6 @@ public class PlanService {
         memberPlan.changeColor(newColor);
     }
 
-    @Transactional(readOnly = true)
-    // 계획에 참여중인 사용자의 온라인 상태 목록 반환
-    public List<MemberOnlineStatusDto> getOnlineMembers(Long planId, String username) {
-        Plan plan = getPlan(planId);
-        List<Member> members = plan.getMemberPlans().stream()
-                .map(MemberPlan::getMember)
-                .toList();
-        return members.stream()
-                .map(member -> new MemberOnlineStatusDto(
-                        member.getMemberId(),
-                        member.getNickname(),
-                        member.getProfileImage(),
-                        checkOnlineStatus(member.getMemberId())
-                ))
-                .collect(Collectors.toList());
-    }
-
     // ToDo: 온라인 여부 확인 (추후 구현 예정)
     private boolean checkOnlineStatus(Long memberId) {
         return false;

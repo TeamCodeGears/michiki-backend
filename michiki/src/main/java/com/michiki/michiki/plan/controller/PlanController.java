@@ -89,20 +89,6 @@ public class PlanController {
         return ResponseEntity.ok(response);
     }
 
-    //uri기반 계획 조회
-    @GetMapping("/share/{shareURI}")
-    public ResponseEntity<PlanDetailResponseDto> getPlanByShareURI(
-            @PathVariable String shareURI,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        //로그인 안함 -> 편집x 관전
-        if (userDetails == null || userDetails.getUsername() == null) {
-            return ResponseEntity.ok(planService.getPlanByShareURI(shareURI));
-        }
-        // 로그인 -> 자동 참여
-        return ResponseEntity.ok(planService.joinPlanByShareURI(shareURI, userDetails.getUsername()));
-
-    }
     // 알림 페이지 확인 -> 알림 읽음 처리
     @PostMapping("/notifications/read")
     @SecurityRequirement(name = "bearerAuth")
