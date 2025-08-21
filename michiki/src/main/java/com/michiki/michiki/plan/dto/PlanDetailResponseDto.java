@@ -1,14 +1,18 @@
 package com.michiki.michiki.plan.dto;
 
 import com.michiki.michiki.place.dto.PlaceResponseDto;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 // 계획 상세 정보 응답 DTO
 public class PlanDetailResponseDto {
     private Long planId;
