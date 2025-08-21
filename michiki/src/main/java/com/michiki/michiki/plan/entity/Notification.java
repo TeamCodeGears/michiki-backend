@@ -30,6 +30,7 @@ public class Notification {
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean isRead = false;
 
     public void markAsRead() {
