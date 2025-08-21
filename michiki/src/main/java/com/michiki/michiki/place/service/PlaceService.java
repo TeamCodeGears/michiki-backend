@@ -11,6 +11,7 @@ import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
 import com.michiki.michiki.plan.entity.Plan;
 import com.michiki.michiki.plan.repository.PlanRepository;
+import com.michiki.michiki.plan.service.NotificationService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final PlanRepository planRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     // 장소 추가
     @Transactional
@@ -54,6 +56,8 @@ public class PlaceService {
         Place place = getPlace(plan, placeId);
 
         place.changePlan(dto);
+
+        notificationService.notifyPlaceChanged(plan.getPlanId());
     }
 
     // 장소 삭제
@@ -68,6 +72,8 @@ public class PlaceService {
         plan.getPlaces().remove(place);
 
         placeRepository.delete(place);
+
+        notificationService.notifyPlaceChanged(plan.getPlanId());
     }
 
     // 장소 순서 정렬
@@ -89,6 +95,8 @@ public class PlaceService {
                     return place;
                 })
                 .toList();
+
+        notificationService.notifyPlaceChanged(plan.getPlanId());
 
         return updated.stream()
                 .sorted(Comparator.comparing(Place::getOrderInDay))

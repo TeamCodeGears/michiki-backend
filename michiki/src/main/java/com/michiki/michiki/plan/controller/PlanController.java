@@ -2,6 +2,7 @@ package com.michiki.michiki.plan.controller;
 
 import com.michiki.michiki.member.service.MemberService;
 import com.michiki.michiki.plan.dto.*;
+import com.michiki.michiki.plan.service.NotificationService;
 import com.michiki.michiki.plan.service.PlanService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -23,6 +24,9 @@ public class PlanController {
 
     private final PlanService planService;
     private final MemberService memberService;
+    private final NotificationService notificationService;
+
+
     // 연도별 여행 계획 목록 조회
     @GetMapping
     public ResponseEntity<List<PlanResponseDto>> getPlansByStartYear(
@@ -85,15 +89,28 @@ public class PlanController {
         return ResponseEntity.ok(response);
     }
 
-    // 해당 계획 접속중인 온라인 유저 목록 조회
-    @GetMapping("/{planId}/members/online-members")
-    @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<List<MemberOnlineStatusDto>> getOnlineMembers(
-            @PathVariable Long planId,
+    //uri기반 계획 조회
+    @GetMapping("/share/{shareURI}")
+    public ResponseEntity<PlanDetailResponseDto> getPlanByShareURI(
+            @PathVariable String shareURI,
             @AuthenticationPrincipal UserDetails userDetails) {
-        String username = userDetails.getUsername();
-        List<MemberOnlineStatusDto> onlineMembers = planService.getOnlineMembers(planId, username);
-        return ResponseEntity.ok(onlineMembers);
+
+        //로그인 안함 -> 편집x 관전
+        if (userDetails == null || userDetails.getUsername() == null) {
+            return ResponseEntity.ok(planService.getPlanByShareURI(shareURI));
+        }
+        // 로그인 -> 자동 참여
+        return ResponseEntity.ok(planService.joinPlanByShareURI(shareURI, userDetails.getUsername()));
+
+    }
+    // 알림 페이지 확인 -> 알림 읽음 처리
+    @PostMapping("/notifications/read")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Void> markNotificationsAsRead(@AuthenticationPrincipal UserDetails userDetails) {
+        Long memberId = memberService.findByMember(userDetails.getUsername()).getMemberId();
+        // 전부 읽음 처리
+        notificationService.markAllAsRead(memberId);
+        return ResponseEntity.ok().build();
     }
 
     //uri기반 계획 조회
@@ -109,6 +126,5 @@ public class PlanController {
         // 로그인 -> 자동 참여
         return ResponseEntity.ok(planService.joinPlanByShareURI(shareURI, userDetails.getUsername()));
     }
-
 
     }
