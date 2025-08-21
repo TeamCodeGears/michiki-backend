@@ -77,8 +77,8 @@ public class MemberController {
 
         //회원 가입 되있는 유저라면 토큰발급
         // 내부 JWT 토큰 발급 (액세스 토큰 + 리프레시 토큰)
-        String accessToken = jwtTokenProvider.createAccessToken(originalMember.getEmail());
-        String refreshToken = jwtTokenProvider.createRefreshToken(originalMember.getEmail());
+        String accessToken = jwtTokenProvider.createAccessToken(originalMember.getMemberId(), originalMember.getEmail(), originalMember.getNickname(), originalMember.getProfileImage());
+        String refreshToken = jwtTokenProvider.createRefreshToken(originalMember.getMemberId(), originalMember.getEmail(), originalMember.getNickname(), originalMember.getProfileImage());
 
         // 리프레시 토큰은 별도의 저장소에 저장해야 합니다 (DB 또는 Redis 등)
         refreshTokenService.saveRefreshToken(originalMember.getEmail(), refreshToken);

@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 특정 url 패턴에 대해서는 인증처리(Authentication 객체생성) 재외
                 .authorizeHttpRequests(a -> a.requestMatchers(
+                        "/ws/**",
                         "/member/google/login",
                         "/oauth/google/redirect",
                         "/auth/refresh-token",

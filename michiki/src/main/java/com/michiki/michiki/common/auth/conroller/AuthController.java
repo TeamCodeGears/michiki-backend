@@ -41,14 +41,17 @@ public class AuthController {
         String refreshToken = request.getRefreshToken();
         try {
             Claims claims = jwtTokenProvider.validateToken(refreshToken);
+            Long memberId = claims.get("memberId", Long.class);
             String email = claims.getSubject();
+            String nickname = claims.get("nickname", String.class);
+            String profileImage = claims.get("profileImage", String.class);
 
             if (!refreshTokenService.isValidRefreshToken(email, refreshToken)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "invalid_refresh_token", "message", "저장소에 없는 또는 만료된 리프레시 토큰입니다."));
             }
 
-            String accessToken = jwtTokenProvider.createAccessToken(email);
+            String accessToken = jwtTokenProvider.createAccessToken(memberId, email, nickname, profileImage);
             // 필요시 새로운 refreshToken 재발급, 저장소 교체
 
             Map<String, String> tokens = new HashMap<>();
