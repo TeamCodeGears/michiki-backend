@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 @Slf4j
@@ -25,13 +27,17 @@ public class JwtTokenFilter extends GenericFilter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         String path = httpServletRequest.getRequestURI();
 
         // swagger 관련 경로를 필터링에서 제외
-        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")
+        if (path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
                 || path.equals("/member/google/login") // 필요하다면 추가로 제외
-                || path.equals("/oauth/google/redirect")) {
+                || path.equals("/oauth/google/redirect")
+                || path.equals("/auth/refresh-token")
+        ) {
             chain.doFilter(request, response);
             return;
         }
@@ -56,9 +62,17 @@ public class JwtTokenFilter extends GenericFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
             chain.doFilter(request, response);
+        } catch (TokenAuthenticationException e) {
+            log.info("TokenAuthenticationException: {}", e.getMessage());
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpServletResponse.setContentType("application/json;charset=UTF-8");
+            httpServletResponse.getOutputStream().write(("{\"message\": \"" + e.getMessage() + "\"}").getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             log.info("exception: {}", e.getMessage());
-            throw new TokenAuthenticationException("유효하지 않은 토큰입니다.");
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpServletResponse.setContentType("application/json;charset=UTF-8");
+            httpServletResponse.getOutputStream().write(("{\"message\": \"유효하지 않은 토큰입니다.\"}").getBytes(StandardCharsets.UTF_8));
         }
+
     }
 }
