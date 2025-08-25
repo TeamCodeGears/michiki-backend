@@ -29,15 +29,13 @@ public class JwtTokenFilter extends GenericFilter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
+
         String path = httpServletRequest.getRequestURI();
 
         // swagger 관련 경로를 필터링에서 제외
-        if (path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
+        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")
                 || path.equals("/member/google/login") // 필요하다면 추가로 제외
-                || path.equals("/oauth/google/redirect")
-                || path.equals("/auth/refresh-token")
-        ) {
+                || path.equals("/oauth/google/redirect")) {
             chain.doFilter(request, response);
             return;
         }
