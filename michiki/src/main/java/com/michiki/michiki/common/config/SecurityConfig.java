@@ -4,6 +4,7 @@ import com.michiki.michiki.common.auth.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,18 +33,22 @@ public class SecurityConfig {
                 // 세션방식을 비활성화
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 특정 url 패턴에 대해서는 인증처리(Authentication 객체생성) 재외
-                .authorizeHttpRequests(a -> a.requestMatchers(
-                        "/ws/**",
-                        "/member/google/login",
-                        "/oauth/google/redirect",
-                        "/auth/refresh-token",
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/v3/api-docs",
-                        "/v3/api-docs/**",
-                        "/v3/api-docs.yaml",
-                        "/swagger-ui/oauth2-redirect.html"
-                ).permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(a -> a
+                        .requestMatchers(
+                                "/ws/**",
+                                "/member/google/login",
+                                "/oauth/google/redirect",
+                                "/auth/refresh-token",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/oauth2-redirect.html"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ★ CORS preflight 전역 허용
+                        .anyRequest().authenticated()
+                )
                 // UsernamePasswordAuthenticationFilter 이 클래스에서 플로그인 인증을 처리
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -56,8 +61,9 @@ public class SecurityConfig {
                 ,"http://localhost:8080",
                 "http://43.200.191.212:8080",
                 "https://teamcodegears.github.io",
-                "http://michiki.org",
-                "http://www.michiki.org"));
+                "http://localhost:5173",
+                "http://michiki.org","http://www.michiki.org",
+                "https://michiki.org","https://www.michiki.org"));
         configuration.setAllowedMethods(List.of("*")); // 모든 HTTP 메서드 허용
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더값 허용
         configuration.setAllowCredentials(true); // 자격증명허용
