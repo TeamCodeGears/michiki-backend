@@ -11,6 +11,7 @@ import com.michiki.michiki.place.entity.Place;
 import com.michiki.michiki.place.repository.PlaceRepository;
 import com.michiki.michiki.plan.entity.Plan;
 import com.michiki.michiki.plan.repository.PlanRepository;
+import com.michiki.michiki.plan.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,10 @@ class PlaceServiceTest {
 
     @Mock
     MemberRepository memberRepository;
+
+    @Mock
+    NotificationService notificationService;
+
 
     @InjectMocks
     PlaceService placeService;
@@ -114,6 +119,7 @@ class PlaceServiceTest {
         placeService.deletePlace(MEMBER_ID, PLAN_ID, PLACE_ID);
 
         verify(placeRepository).delete(place);
+
     }
 
     @Test
