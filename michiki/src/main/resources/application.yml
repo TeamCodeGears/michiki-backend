@@ -37,5 +37,5 @@ oauth:
   google:
     client-id: ${GOOGLE_CLIENT_ID}
     client-secret: ${GOOGLE_CLIENT_SECRET}
-#    redirect-uri: http://www.michiki.org
-    redirect-uri: http://localhost:5173
+    redirect-uri: http://www.michiki.org
+#    redirect-uri: http://localhost:5173

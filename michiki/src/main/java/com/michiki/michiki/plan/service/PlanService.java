@@ -132,6 +132,7 @@ public class PlanService {
                 .endDate(plan.getEndDate())
                 .places(placeDtos)
                 .members(memberDtos)
+                .shareURI(plan.getShareURI())
                 .build();
     }
 
