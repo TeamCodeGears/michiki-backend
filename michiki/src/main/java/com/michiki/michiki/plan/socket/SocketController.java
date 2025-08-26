@@ -26,7 +26,7 @@ public class SocketController {
         template.convertAndSend("/topic/plan/" + planId + "/mouse", mp);
     }
 
-    @MessageMapping("/plan/{planId}/chat")
+    @MessageMapping("/plan/{planId}/message")
     public void broadcastChatMessage(@DestinationVariable Long planId, ChatMessage cm, Principal principal){
         if (principal instanceof StompMemberPrincipal user) {
             cm.setMemberId(user.getMemberId());
