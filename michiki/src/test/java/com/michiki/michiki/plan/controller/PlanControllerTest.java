@@ -3,14 +3,18 @@ package com.michiki.michiki.plan.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.michiki.michiki.member.entity.Member;
 import com.michiki.michiki.member.service.MemberService;
+import com.michiki.michiki.plan.dto.PlanDetailResponseDto;
 import com.michiki.michiki.plan.service.NotificationService;
 import com.michiki.michiki.plan.service.PlanService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -20,7 +24,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PlanController.class)
@@ -63,6 +69,54 @@ class PlanControllerTest {
 
         Mockito.verify(notificationService, Mockito.times(1))
                 .markAllAsRead(1L);
+    }
+
+    @Test
+    @DisplayName("공유 URI 조회 - 비로그인(관전자)")
+    void getPlanByShareURI_asGuest() throws Exception {
+        // given
+        PlanDetailResponseDto dummyResponse = PlanDetailResponseDto.builder()
+                .planId(100L)
+                .title("테스트 계획")
+                .build();
+
+        Mockito.when(planService.getPlanByShareURI("abc123"))
+                .thenReturn(dummyResponse);
+
+        // when & then
+        mockMvc.perform(get("/plans/share/{shareURI}", "abc123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.planId").value(100L))
+                .andExpect(jsonPath("$.title").value("테스트 계획"));
+
+        Mockito.verify(planService, Mockito.times(1)).getPlanByShareURI("abc123");
+        Mockito.verify(planService, Mockito.never()).joinPlanByShareURI(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("공유 URI 조회 - 로그인(자동 참여)")
+    @WithMockUser(username = "test@example.com")
+    void getPlanByShareURI_asAuthenticatedUser() throws Exception {
+        // given
+        PlanDetailResponseDto dummyResponse = PlanDetailResponseDto.builder()
+                .planId(200L)
+                .title("참여된 계획")
+                .build();
+
+        Mockito.when(planService.joinPlanByShareURI("xyz789", "test@example.com"))
+                .thenReturn(dummyResponse);
+
+        // when & then
+        mockMvc.perform(get("/plans/share/{shareURI}", "xyz789"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.planId").value(200L))
+                .andExpect(jsonPath("$.title").value("참여된 계획"));
+
+        Mockito.verify(planService, Mockito.times(1))
+                .joinPlanByShareURI("xyz789", "test@example.com");
+
+        Mockito.verify(planService, Mockito.never())
+                .getPlanByShareURI(anyString());
     }
 
     @TestConfiguration
