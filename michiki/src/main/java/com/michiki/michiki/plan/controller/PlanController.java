@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ public class PlanController {
     private final PlanService planService;
     private final MemberService memberService;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
 
     // 연도별 여행 계획 목록 조회
@@ -61,19 +64,17 @@ public class PlanController {
         return ResponseEntity.ok(Map.of("message", "방" + message + " 성공"));
     }
 
-    // 여행 계획 색상 변경
-    @PostMapping("/{planId}/newColor")
-    public ResponseEntity<Map<String, String>> changeColor(
-            @PathVariable Long planId,
-            @Valid @RequestBody ChangeColorRequestDto changeColorRequestDto,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        Long memberId = getMemberId(userDetails);
-        planService.changeColor(memberId, planId, changeColorRequestDto.getColor());
-        return ResponseEntity.ok(Map.of("message", "변경 성공"));
+    //    // 여행 계획 색상 변경
+    @MessageMapping("/colorChange")
+    public void colorChange(ColorChangeMessage message) {
+        planService.changeColor(message.getMemberId(), message.getPlanId(), message.getColor());
 
+        messagingTemplate.convertAndSend(
+                "/topic/plan/" + message.getPlanId() + "/color",
+                message.getColor()
+        );
+    }
 
-}
     // 현재 로그인한 사용자의 memberId 조회
     private Long getMemberId(UserDetails userDetails) {
         String email = userDetails.getUsername();

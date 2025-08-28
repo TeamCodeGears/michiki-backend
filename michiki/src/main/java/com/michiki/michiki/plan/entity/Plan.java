@@ -3,20 +3,13 @@ package com.michiki.michiki.plan.entity;
 import com.michiki.michiki.common.BaseEntity;
 import com.michiki.michiki.pivot.entity.MemberPlan;
 import com.michiki.michiki.place.entity.Place;
-import com.michiki.michiki.plan.dto.PlanDetailResponseDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,4 +55,7 @@ public class Plan extends BaseEntity {
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberPlan> memberPlans = new ArrayList<>();
 
+    public void setMemberPlans(ArrayList<MemberPlan> memberPlans) {
+        this.memberPlans = memberPlans;
+    }
 }

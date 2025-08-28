@@ -132,37 +132,7 @@ public class PlaceController {
         List<PlaceResponseDto> reordered = placeService.reorderPlaces(memberId, planId, placeReorderRequestDto);
         return ResponseEntity.ok(reordered);
     }
-
-    // 추천 장소 조회 API
-    @Operation(
-            summary = "추천 장소 목록 조회",
-            description = "줌 레벨과 중심 좌표를 기준으로 추천 장소 목록을 조회합니다.",
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200",
-                    description = "추천 장소 목록 반환",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PlaceResponseDto.class, type = "array")
-                    )
-            ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 계획")
-    })
-
-    @PostMapping("/{planId}/recommendations")
-    public ResponseEntity<List<PlaceResponseDto>> getRecommendedPlace(
-            @PathVariable Long planId,
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody PlaceRecommendationRequestDto requestDto
-    ) {
-        Long memberId = getMemberId(userDetails);
-        List<PlaceResponseDto> recommendations =
-                placeService.recommendPlaces(memberId, planId, requestDto);
-        return ResponseEntity.ok(recommendations);
-    }
-
+    
     // 유저 인증 정보에서 memberID 추출
     private Long getMemberId(UserDetails userDetails) {
         String email = userDetails.getUsername();
