@@ -91,7 +91,7 @@ public class PlanControllerTest {
         List<PlanResponseDto> result = planService.getPlansStartInYear(1L, 2025);
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getTitle()).isEqualTo("여행계획");
-    }
+   }
 
     @Test
     void leavePlan_lastDeletes() {
