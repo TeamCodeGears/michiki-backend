@@ -43,6 +43,8 @@ public class PlaceService {
         plan.getPlaces().add(place);
 
         placeRepository.save(place);
+
+        notificationService.notifyPlaceChanged(plan.getPlanId());
     }
 
     // 장소 설명 수정
