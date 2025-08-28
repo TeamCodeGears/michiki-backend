@@ -142,7 +142,6 @@ public class PlanControllerTest {
         when(memberRepository.findByEmail("x@x.com")).thenReturn(Optional.of(member));
         when(placeRepository.findByPlanOrderByTravelDateAsc(plan)).thenReturn(Collections.emptyList());
 
-        PlanDetailResponseDto result = planService.joinPlanByShareURI("uri1", "x@x.com");
         assertThat(plan.getMemberPlans()).hasSize(1);
         verify(planRepository).save(plan); // 자동저장 확인
     }

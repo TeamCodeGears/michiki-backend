@@ -21,4 +21,5 @@ public class PlanDetailResponseDto {
     private LocalDate endDate;
     private List<PlanMemberDto> members;
     private List<PlaceResponseDto> places;
+    private String shareURI;
 }
