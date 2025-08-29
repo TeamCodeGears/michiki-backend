@@ -91,11 +91,6 @@ public class PlanService {
         memberPlan.changeColor(newColor);
     }
 
-    // ToDo: 온라인 여부 확인 (추후 구현 예정)
-    private boolean checkOnlineStatus(Long memberId) {
-        return false;
-    }
-
     // 여행 계획 상세 정보 조회
     @Transactional(readOnly = true)
     public PlanDetailResponseDto getPlanDetail(Long planId) {
@@ -195,7 +190,7 @@ public class PlanService {
         // 로그인 된 사용자 조회 -> 예외 발생 안시키고 다시 관전 모드로 돌림
         Optional<Member> optionalMember = memberRepository.findByEmail(username);
         if (optionalMember.isEmpty()) {
-            return getPlanByShareURI(shareURI);
+            return buildPlanDetailDtoWithMembers(plan);
         }
 
         Member member = optionalMember.get();
@@ -211,8 +206,45 @@ public class PlanService {
             planRepository.save(plan);
         }
         // 아니면 다시 관람 모드로 돌림
-        return getPlanByShareURI(shareURI);
+        return buildPlanDetailDtoWithMembers(plan);
     }
+
+    private PlanDetailResponseDto buildPlanDetailDtoWithMembers(Plan plan) {
+        List<Place> places = placeRepository.findByPlanOrderByTravelDateAsc(plan);
+        List<PlaceResponseDto> placeDtos = places.stream()
+                .map(place -> PlaceResponseDto.builder()
+                        .memberId(place.getMember().getMemberId())
+                        .placeId(place.getPlaceId())
+                        .name(place.getName())
+                        .description(place.getDescription())
+                        .latitude(place.getLatitude())
+                        .longitude(place.getLongitude())
+                        .googlePlaceId(place.getGooglePlaceId())
+                        .travelDate(place.getTravelDate())
+                        .orderInDay(place.getOrderInDay())
+                        .build())
+                .toList();
+
+        List<PlanMemberDto> memberDtos = plan.getMemberPlans().stream()
+                .map(mp -> PlanMemberDto.builder()
+                        .memberId(mp.getMember().getMemberId())
+                        .nickname(mp.getMember().getNickname())
+                        .profileImage(mp.getMember().getProfileImage())
+                        .color(mp.getColor())
+                        .build())
+                .toList();
+
+        return PlanDetailResponseDto.builder()
+                .planId(plan.getPlanId())
+                .title(plan.getTitle())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
+                .places(placeDtos)
+                .members(memberDtos)
+                .shareURI(plan.getShareURI())
+                .build();
+    }
+
 
 
 }

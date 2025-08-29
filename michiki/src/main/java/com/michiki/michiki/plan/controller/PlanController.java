@@ -69,9 +69,14 @@ public class PlanController {
     public void colorChange(ColorChangeMessage message) {
         planService.changeColor(message.getMemberId(), message.getPlanId(), message.getColor());
 
+        Map<String, Object> payload = Map.of(
+                "memberId", message.getMemberId(),
+                "color", message.getColor()
+        );
+
         messagingTemplate.convertAndSend(
                 "/topic/plan/" + message.getPlanId() + "/color",
-                message.getColor()
+                payload
         );
     }
 
