@@ -14,14 +14,12 @@ import com.michiki.michiki.plan.dto.*;
 import com.michiki.michiki.plan.entity.Plan;
 import com.michiki.michiki.plan.repository.PlanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -32,6 +30,7 @@ public class PlanService {
     private final MemberRepository memberRepository;
     private final PlanRepository planRepository;
     private final PlaceRepository placeRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     private static final Random random = new Random();
 
@@ -89,11 +88,6 @@ public class PlanService {
         MemberPlan memberPlan = memberPlanRepository.findByMemberAndPlan(member, plan)
                 .orElseThrow(() -> new NotParticipatingMemberException("해당 계획에 참여중이 아닙니다."));
         memberPlan.changeColor(newColor);
-    }
-
-    // ToDo: 온라인 여부 확인 (추후 구현 예정)
-    private boolean checkOnlineStatus(Long memberId) {
-        return false;
     }
 
     // 여행 계획 상세 정보 조회
@@ -195,7 +189,7 @@ public class PlanService {
         // 로그인 된 사용자 조회 -> 예외 발생 안시키고 다시 관전 모드로 돌림
         Optional<Member> optionalMember = memberRepository.findByEmail(username);
         if (optionalMember.isEmpty()) {
-            return getPlanByShareURI(shareURI);
+            return buildPlanDetailDtoWithMembers(plan);
         }
 
         Member member = optionalMember.get();
@@ -209,10 +203,52 @@ public class PlanService {
             String color = getRandomHexColor();
             plan.getMemberPlans().add(new MemberPlan(member, plan, color));
             planRepository.save(plan);
+
+            simpMessagingTemplate.convertAndSend(
+                    "/topic/plan" + plan.getPlanId() + "/color",
+                    Map.of("memberId", member.getPlans(), "color", color)
+            );
         }
         // 아니면 다시 관람 모드로 돌림
-        return getPlanByShareURI(shareURI);
+        return buildPlanDetailDtoWithMembers(plan);
     }
+
+    private PlanDetailResponseDto buildPlanDetailDtoWithMembers(Plan plan) {
+        List<Place> places = placeRepository.findByPlanOrderByTravelDateAsc(plan);
+        List<PlaceResponseDto> placeDtos = places.stream()
+                .map(place -> PlaceResponseDto.builder()
+                        .memberId(place.getMember().getMemberId())
+                        .placeId(place.getPlaceId())
+                        .name(place.getName())
+                        .description(place.getDescription())
+                        .latitude(place.getLatitude())
+                        .longitude(place.getLongitude())
+                        .googlePlaceId(place.getGooglePlaceId())
+                        .travelDate(place.getTravelDate())
+                        .orderInDay(place.getOrderInDay())
+                        .build())
+                .toList();
+
+        List<PlanMemberDto> memberDtos = plan.getMemberPlans().stream()
+                .map(mp -> PlanMemberDto.builder()
+                        .memberId(mp.getMember().getMemberId())
+                        .nickname(mp.getMember().getNickname())
+                        .profileImage(mp.getMember().getProfileImage())
+                        .color(mp.getColor())
+                        .build())
+                .toList();
+
+        return PlanDetailResponseDto.builder()
+                .planId(plan.getPlanId())
+                .title(plan.getTitle())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
+                .places(placeDtos)
+                .members(memberDtos)
+                .shareURI(plan.getShareURI())
+                .build();
+    }
+
 
 
 }
