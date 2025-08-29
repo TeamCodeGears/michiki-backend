@@ -205,8 +205,8 @@ public class PlanService {
             planRepository.save(plan);
 
             simpMessagingTemplate.convertAndSend(
-                    "/topic/plan" + plan.getPlanId() + "/color",
-                    Map.of("memberId", member.getPlans(), "color", color)
+                    "/topic/plan/" + plan.getPlanId() + "/color",
+                    Map.of("memberId", member.getMemberId(), "color", color)
             );
         }
         // 아니면 다시 관람 모드로 돌림
